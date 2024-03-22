@@ -6,13 +6,16 @@ class SandParticle:
         self.x = x
         self.y = y
         self.color = color
+        self.rendered = False
         self.wetness = wetness
 
     def render(self):
-        rect = pygame.Rect(0, 0, self.simulation.particle_size, self.simulation.particle_size)
-        rect.center = (self.x * self.simulation.particle_size, self.y * self.simulation.particle_size)
-        pygame.draw.rect(self.simulation.window, self.color, rect)
-        self.calculate_physics()
+        if self.rendered is False:
+            rect = pygame.Rect(0, 0, self.simulation.particle_size, self.simulation.particle_size)
+            rect.center = (self.x * self.simulation.particle_size, self.y * self.simulation.particle_size)
+            pygame.draw.rect(self.simulation.window, self.color, rect)
+            self.calculate_physics()
+            self.rendered = True
 
     def calculate_physics(self):
         if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] not in self.simulation.SOLIDS: # check if there is a solid object or border under the sand

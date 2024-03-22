@@ -17,12 +17,13 @@ class Simulation:
         self.SOLIDS = [SAND, STONE, WOOD]
         self.window = self.app.screen
         self.buttons = []
-        self.particle_size = 20 # the length of all particles (in pixels, 1 for perfect detail)
+        self.particle_size = 5 # the length of all particles (in pixels, 1 for perfect detail)
         self.map = [[AIR for _ in range(self.app.width//self.particle_size)] for i in range(self.app.height//self.particle_size)]
         self.particles = {}
-        for x in range(self.app.height//self.particle_size):
-            for y in range(self.app.width//self.particle_size):
+        for y in range(self.app.height//self.particle_size):
+            for x in range(self.app.width//self.particle_size):
                 self.particles[(x, y)] = None
+        print(self.particles)
         self.selected_material = SAND
         self.COLUMNS = self.app.width//self.particle_size
         self.ROWS = self.app.height//self.particle_size
@@ -34,8 +35,11 @@ class Simulation:
             self.add_material()
         for row_idx, row in enumerate(self.map):
             for particle_idx, particle in enumerate(row):
-                if self.particles[(row_idx, particle_idx)] is not None:
-                    self.particles[(row_idx, particle_idx)].render()
+                if self.particles[(particle_idx, row_idx)] is not None:
+                    self.particles[(particle_idx, row_idx)].render()
+        for value in self.particles.values():
+            if value is not None:
+                value.rendered = False
 
     # Overrides the default events function in app.py
     def events(self):
@@ -57,7 +61,7 @@ class Simulation:
         if self.map[clicked_row][clicked_column] == self.selected_material:
             return
         if self.selected_material == SAND:
-            self.particles[(clicked_row, clicked_column)] = sand.SandParticle(self, clicked_column, clicked_row, (230, 200, 0), 0)
+            self.particles[(clicked_column, clicked_row)] = sand.SandParticle(self, clicked_column, clicked_row, (230, 200, 0), 0)
         self.map[clicked_row][clicked_column] = self.selected_material
-        print(self.map)
-
+        #print(self.map)
+        # doesnt add material when column >=180
