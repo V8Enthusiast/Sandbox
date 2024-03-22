@@ -57,8 +57,3 @@ class SandParticle:
             self.simulation.particles[(self.x, self.y)] = None
             self.simulation.particles[(self.x, self.y + 1)] = self
             self.y += 1
-
-
-
-
-

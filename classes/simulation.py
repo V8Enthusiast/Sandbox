@@ -1,5 +1,6 @@
 import pygame
 from physics import sand
+from physics import water
 
 # references used for clearer code
 AIR = 0
@@ -16,9 +17,10 @@ class Simulation:
         self.gravity = 9.81
         self.SOLIDS = [STONE, WOOD]
         self.MOVING_SOLIDS = [SAND]
+        self.LIQUIDS = [WATER]
         self.window = self.app.screen
         self.buttons = []
-        self.particle_size = 5 # the length of all particles (in pixels, 1 for perfect detail)
+        self.particle_size = 20 # the length of all particles (in pixels, 1 for perfect detail)
         self.map = [[AIR for _ in range(self.app.width//self.particle_size)] for i in range(self.app.height//self.particle_size)]
         self.particles = {}
         for y in range(self.app.height//self.particle_size):
@@ -48,6 +50,11 @@ class Simulation:
             if event.type == pygame.QUIT:
                 self.app.run = False
                 pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    self.selected_material = SAND
+                if event.key == pygame.K_2:
+                    self.selected_material = WATER
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.add_material_on = True
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
@@ -63,6 +70,9 @@ class Simulation:
             return
         if self.selected_material == SAND:
             self.particles[(clicked_column, clicked_row)] = sand.SandParticle(self, clicked_column, clicked_row, (230, 200, 0), 0)
+        if self.selected_material == WATER:
+            self.particles[(clicked_column, clicked_row)] = water.WaterParticle(self, clicked_column, clicked_row, (90, 188, 216))
         self.map[clicked_row][clicked_column] = self.selected_material
-        #print(self.map)
-        # doesnt add material when column >=180
+        print(self.map[clicked_row][clicked_column])
+        print(self.map[clicked_row][clicked_column])
+        print(self.map)
