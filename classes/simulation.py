@@ -14,7 +14,8 @@ class Simulation:
     def __init__(self, app):
         self.app = app
         self.gravity = 9.81
-        self.SOLIDS = [SAND, STONE, WOOD]
+        self.SOLIDS = [STONE, WOOD]
+        self.MOVING_SOLIDS = [SAND]
         self.window = self.app.screen
         self.buttons = []
         self.particle_size = 5 # the length of all particles (in pixels, 1 for perfect detail)
