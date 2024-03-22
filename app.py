@@ -5,7 +5,7 @@ class App:
     def __init__(self, width, height, fullscreen, vsync):
         # Save the data passed into the function to variables
         self.clock = pygame.time.Clock()
-        self.fps = 60
+        self.fps = 40
         self.width = width
         self.height = height
         self.is_FS_enabled = fullscreen

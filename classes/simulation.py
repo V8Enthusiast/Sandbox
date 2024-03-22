@@ -20,7 +20,7 @@ class Simulation:
         self.LIQUIDS = [WATER]
         self.window = self.app.screen
         self.buttons = []
-        self.particle_size = 20 # the length of all particles (in pixels, 1 for perfect detail)
+        self.particle_size = 10 # the length of all particles (in pixels, 1 for perfect detail)
         self.map = [[AIR for _ in range(self.app.width//self.particle_size)] for i in range(self.app.height//self.particle_size)]
         self.particles = {}
         for y in range(self.app.height//self.particle_size):
@@ -64,6 +64,8 @@ class Simulation:
         mouse_x, mouse_y = pygame.mouse.get_pos()
         clicked_row = int(mouse_y) // self.particle_size
         clicked_column = int(mouse_x) // self.particle_size
+        print(clicked_column)
+        print(clicked_row)
         if clicked_column >= self.COLUMNS or clicked_row >= self.ROWS:
             return
         if self.map[clicked_row][clicked_column] == self.selected_material:
@@ -72,7 +74,20 @@ class Simulation:
             self.particles[(clicked_column, clicked_row)] = sand.SandParticle(self, clicked_column, clicked_row, (230, 200, 0), 0)
         if self.selected_material == WATER:
             self.particles[(clicked_column, clicked_row)] = water.WaterParticle(self, clicked_column, clicked_row, (90, 188, 216))
+            # self.particles[(clicked_column, clicked_row + 1)] = water.WaterParticle(self, clicked_column, clicked_row + 1,(90, 188, 216))
+            # self.particles[(clicked_column, clicked_row - 1)] = water.WaterParticle(self, clicked_column, clicked_row - 1,(90, 188, 216))
+            # self.particles[(clicked_column - 1, clicked_row)] = water.WaterParticle(self, clicked_column - 1, clicked_row,(90, 188, 216))
+            # self.particles[(clicked_column + 1, clicked_row)] = water.WaterParticle(self, clicked_column + 1, clicked_row,(90, 188, 216))
+            # self.particles[(clicked_column - 1, clicked_row - 1)] = water.WaterParticle(self, clicked_column - 1, clicked_row - 1,(90, 188, 216))
+            # self.particles[(clicked_column + 1, clicked_row + 1)] = water.WaterParticle(self, clicked_column + 1, clicked_row + 1,(90, 188, 216))
+            # self.particles[(clicked_column + 1, clicked_row - 1)] = water.WaterParticle(self, clicked_column + 1, clicked_row - 1,(90, 188, 216))
+            # self.particles[(clicked_column - 1, clicked_row + 1)] = water.WaterParticle(self, clicked_column - 1, clicked_row + 1,(90, 188, 216))
         self.map[clicked_row][clicked_column] = self.selected_material
-        print(self.map[clicked_row][clicked_column])
-        print(self.map[clicked_row][clicked_column])
-        print(self.map)
+        # self.map[clicked_row + 1][clicked_column] = self.selected_material
+        # self.map[clicked_row - 1][clicked_column] = self.selected_material
+        # self.map[clicked_row][clicked_column + 1] = self.selected_material
+        # self.map[clicked_row][clicked_column - 1] = self.selected_material
+        # self.map[clicked_row - 1][clicked_column - 1] = self.selected_material
+        # self.map[clicked_row + 1][clicked_column - 1] = self.selected_material
+        # self.map[clicked_row + 1][clicked_column + 1] = self.selected_material
+        # self.map[clicked_row - 1][clicked_column + 1] = self.selected_material

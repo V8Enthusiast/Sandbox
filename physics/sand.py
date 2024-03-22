@@ -50,6 +50,15 @@ class SandParticle:
                 self.simulation.particles[(self.x - 1, self.y + 1)] = self
                 self.y += 1
                 self.x -= 1
+        # elif self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] in self.simulation.LIQUIDS:
+        #     liquid = self.simulation.map[self.y + 1][self.x]
+        #     self.simulation.map[self.y + 1][self.x] = 1  # add the sand back 1 square lower
+        #     self.simulation.map[self.y - 1][self.x] = liquid
+        #     liquid_particle = self.simulation.particles[(self.x, self.y + 1)]
+        #     self.simulation.particles[(self.x, self.y + 1)] = self
+        #     self.simulation.particles[(self.x, self.y - 1)] = liquid_particle
+        #
+        #     self.y += 1
 
         elif self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] not in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS: # check if there is a solid object or border under the sand
             self.simulation.map[self.y][self.x] = 0 # reset the current square

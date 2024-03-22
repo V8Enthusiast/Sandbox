@@ -22,7 +22,7 @@ class WaterParticle:
             #print(self.simulation.map[self.y + 1][self.x])
             pass
         #print(self.simulation.LIQUIDS)
-        if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] in self.simulation.LIQUIDS: # particle under is a moving one (sand)
+        if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] in self.simulation.LIQUIDS + self.simulation.MOVING_SOLIDS: # particle under is a moving one (sand)
             # #print("f")
             # if self.x + 1 < self.simulation.COLUMNS:
             #     right_below = self.simulation.map[self.y + 1][self.x + 1] in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS + self.simulation.LIQUIDS # checks if the particle should move down to the right
@@ -59,7 +59,7 @@ class WaterParticle:
 
             # to the right
             first_empty_particle_right_x = None
-            for i in range(self.simulation.COLUMNS - self.x):
+            for i in range(1, self.simulation.COLUMNS - self.x):
                 if self.simulation.map[self.y + 1][self.x + i] == 0:
                     first_empty_particle_right_x = self.x + i
                     break
@@ -68,7 +68,7 @@ class WaterParticle:
 
             # to the left
             first_empty_particle_left_x = None
-            for n in range(self.x):
+            for n in range(1, self.x):
                 if self.simulation.map[self.y + 1][self.x - n] == 0:
                     first_empty_particle_left_x = self.x - n
                     break
@@ -102,10 +102,45 @@ class WaterParticle:
                 self.simulation.particles[(first_empty_particle_right_x, self.y + 1)] = self
                 self.y += 1
                 self.x = first_empty_particle_right_x
+        # elif self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS: # water is on top of a solid
+        #     if self.x + 1 < self.simulation.COLUMNS:
+        #         right_below = self.simulation.map[self.y][self.x + 1] != 0
+        #     else:
+        #         right_below = True
+        #     if self.x - 1 >= 0:
+        #         left_below = self.simulation.map[self.y][self.x - 1] != 0
+        #     else:
+        #         left_below = True
+        #
+        #     if right_below is False and left_below is False: # if both are true choose one side which the particle will head to
+        #         if random.randint(0, 100) >= 50:
+        #             left_below = True
+        #         else:
+        #             right_below = True
+        #
+        #     if right_below is False: # particle falls to the right
+        #         self.simulation.map[self.y][self.x] = 0  # reset the current square
+        #         self.simulation.map[self.y][self.x + 1] = 1  # add the water back 1 square lower
+        #         self.simulation.particles[(self.x, self.y)] = None
+        #         self.simulation.particles[(self.x + 1, self.y)] = self
+        #         self.x += 1
+        #
+        #     if left_below is False: # particle falls to the left
+        #         self.simulation.map[self.y][self.x] = 0  # reset the current square
+        #         self.simulation.map[self.y][self.x - 1] = 1  # add the water back 1 square lower
+        #         self.simulation.particles[(self.x, self.y)] = None
+        #         self.simulation.particles[(self.x - 1, self.y)] = self
+        #         self.x -= 1
 
-        elif self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] not in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS: # check if there is a solid object or border under the sand
+        elif self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] not in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS: # water is on top of water or air
             self.simulation.map[self.y][self.x] = 0 # reset the current square
             self.simulation.map[self.y + 1][self.x] = 2 # add the sand back 1 square lower
             self.simulation.particles[(self.x, self.y)] = None
             self.simulation.particles[(self.x, self.y + 1)] = self
             self.y += 1
+        # elif self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y][self.x + 1] == 0:
+        #     self.simulation.map[self.y][self.x] = 0  # reset the current square
+        #     self.simulation.map[self.y][self.x + 1] = 2  # add the sand back 1 square lower
+        #     self.simulation.particles[(self.x, self.y)] = None
+        #     self.simulation.particles[(self.x + 1, self.y)] = self
+        #     self.x += 1
