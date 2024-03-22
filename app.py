@@ -4,6 +4,8 @@ from classes import mainmenu
 class App:
     def __init__(self, width, height, fullscreen, vsync):
         # Save the data passed into the function to variables
+        self.clock = pygame.time.Clock()
+        self.fps = 60
         self.width = width
         self.height = height
         self.is_FS_enabled = fullscreen
@@ -28,8 +30,6 @@ class App:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 self.run = False
-            if self.isUserMovingPiece:
-                self.ui.board.moving_piece.rect.center = pygame.mouse.get_pos()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 click_pos = pygame.mouse.get_pos()
                 for button in self.ui.buttons:
@@ -45,9 +45,11 @@ class App:
     def update(self):
         pygame.display.update()
     def mainloop(self):
+        self.clock.tick(self.fps)
         if self.run is False:
             pygame.quit()
         self.background()
         self.ui.render()
         self.update()
+        self.ui.events()
         self.events()

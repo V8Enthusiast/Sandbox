@@ -18,3 +18,5 @@ class MainMenu:
             display_text_rect = display_text.get_rect()
             display_text_rect.center = self.main_text_rect_center
             self.app.screen.blit(display_text, display_text_rect)
+    def events(self):
+        pass
