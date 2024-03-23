@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from physics import sand
 from physics import water
@@ -20,11 +22,12 @@ class Simulation:
         self.LIQUIDS = [WATER]
         self.window = self.app.screen
         self.buttons = []
-        self.particle_size = 10 # the length of all particles (in pixels, 1 for perfect detail)
+        self.particle_size = 5 # the length of all particles (in pixels, 1 for perfect detail)
         self.COLUMNS = self.app.width // self.particle_size
         self.ROWS = self.app.height // self.particle_size
         self.map = [[AIR for _ in range(self.COLUMNS)] for i in range(self.ROWS)]
         self.particles = {}
+        self.place_radius = 1
         for y in range(self.ROWS):
             for x in range(self.COLUMNS):
                 self.particles[(x, y)] = None
@@ -69,31 +72,22 @@ class Simulation:
         if self.map[clicked_row][clicked_column] == self.selected_material:
             return
         if self.selected_material == SAND:
-            self.particles[(clicked_column, clicked_row)] = sand.SandParticle(self, clicked_column, clicked_row, (230, 200, 0), 0)
-            self.particles[(clicked_column, clicked_row + 1)] = sand.SandParticle(self, clicked_column, clicked_row + 1, (230, 200, 0), 0)
-            self.particles[(clicked_column, clicked_row - 1)] = sand.SandParticle(self, clicked_column, clicked_row - 1, (230, 200, 0), 0)
-            self.particles[(clicked_column - 1, clicked_row)] = sand.SandParticle(self, clicked_column - 1, clicked_row, (230, 200, 0), 0)
-            self.particles[(clicked_column + 1, clicked_row)] = sand.SandParticle(self, clicked_column + 1, clicked_row, (230, 200, 0), 0)
-            self.particles[(clicked_column - 1, clicked_row - 1)] = sand.SandParticle(self, clicked_column - 1, clicked_row - 1, (230, 200, 0), 0)
-            self.particles[(clicked_column + 1, clicked_row + 1)] = sand.SandParticle(self, clicked_column + 1, clicked_row + 1, (230, 200, 0), 0)
-            self.particles[(clicked_column + 1, clicked_row - 1)] = sand.SandParticle(self, clicked_column + 1, clicked_row - 1, (230, 200, 0), 0)
-            self.particles[(clicked_column - 1, clicked_row + 1)] = sand.SandParticle(self, clicked_column - 1, clicked_row + 1, (230, 200, 0), 0)
+            #self.particles[(clicked_column, clicked_row)] = sand.SandParticle(self, clicked_column, clicked_row, (230, 200, 0), 0)
+            for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
+                for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
+                    if random.randint(0, 100) > 65:
+                        try:
+                            self.map[y][x] = self.selected_material
+                            self.particles[(x, y)] = sand.SandParticle(self, x, y, (230, 200, 0), 0)
+                        except:
+                            pass
+
         if self.selected_material == WATER:
-            self.particles[(clicked_column, clicked_row)] = water.WaterParticle(self, clicked_column, clicked_row, (90, 188, 216))
-            self.particles[(clicked_column, clicked_row + 1)] = water.WaterParticle(self, clicked_column, clicked_row + 1,(90, 188, 216))
-            self.particles[(clicked_column, clicked_row - 1)] = water.WaterParticle(self, clicked_column, clicked_row - 1,(90, 188, 216))
-            self.particles[(clicked_column - 1, clicked_row)] = water.WaterParticle(self, clicked_column - 1, clicked_row,(90, 188, 216))
-            self.particles[(clicked_column + 1, clicked_row)] = water.WaterParticle(self, clicked_column + 1, clicked_row,(90, 188, 216))
-            self.particles[(clicked_column - 1, clicked_row - 1)] = water.WaterParticle(self, clicked_column - 1, clicked_row - 1,(90, 188, 216))
-            self.particles[(clicked_column + 1, clicked_row + 1)] = water.WaterParticle(self, clicked_column + 1, clicked_row + 1,(90, 188, 216))
-            self.particles[(clicked_column + 1, clicked_row - 1)] = water.WaterParticle(self, clicked_column + 1, clicked_row - 1,(90, 188, 216))
-            self.particles[(clicked_column - 1, clicked_row + 1)] = water.WaterParticle(self, clicked_column - 1, clicked_row + 1,(90, 188, 216))
-        self.map[clicked_row][clicked_column] = self.selected_material
-        self.map[clicked_row + 1][clicked_column] = self.selected_material
-        self.map[clicked_row - 1][clicked_column] = self.selected_material
-        self.map[clicked_row][clicked_column + 1] = self.selected_material
-        self.map[clicked_row][clicked_column - 1] = self.selected_material
-        self.map[clicked_row - 1][clicked_column - 1] = self.selected_material
-        self.map[clicked_row + 1][clicked_column - 1] = self.selected_material
-        self.map[clicked_row + 1][clicked_column + 1] = self.selected_material
-        self.map[clicked_row - 1][clicked_column + 1] = self.selected_material
+            for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
+                for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
+                    if random.randint(0, 100) > 10:
+                        try:
+                            self.map[y][x] = self.selected_material
+                            self.particles[(x, y)] = water.WaterParticle(self, x, y, (90, 188, 216))
+                        except:
+                            pass
