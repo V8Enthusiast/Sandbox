@@ -8,6 +8,7 @@ class SandParticle:
         self.y = y
         self.color = color
         self.rendered = False
+        self.isFalling = True
         self.wetness = wetness
 
     def render(self):
@@ -19,7 +20,15 @@ class SandParticle:
             self.rendered = True
 
     def calculate_physics(self):
-        if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] in self.simulation.MOVING_SOLIDS: # particle under is a moving one (sand)
+        if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] != 0 and self.simulation.particles[(self.x, self.y + 1)].isFalling is False:
+            self.isFalling = False
+        elif self.y + 1 >= self.simulation.ROWS:
+            self.isFalling = False
+
+        if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] == 0:
+            self.isFalling = True
+
+        if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] in self.simulation.MOVING_SOLIDS and self.isFalling is False: # particle under is a moving one (sand)
             if self.x + 1 < self.simulation.COLUMNS:
                 right_below = self.simulation.map[self.y + 1][self.x + 1] in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS # checks if the particle should move down to the right
             else:

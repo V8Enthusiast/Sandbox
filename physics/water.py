@@ -8,6 +8,7 @@ class WaterParticle:
         self.y = y
         self.color = color
         self.rendered = False
+        self.isFalling = True
 
     def render(self):
         if self.rendered is False:
@@ -18,11 +19,15 @@ class WaterParticle:
             self.rendered = True
 
     def calculate_physics(self):
-        if self.y + 1 < self.simulation.ROWS:
-            #print(self.simulation.map[self.y + 1][self.x])
-            pass
-        #print(self.simulation.LIQUIDS)
-        if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] in self.simulation.LIQUIDS + self.simulation.MOVING_SOLIDS: # particle under is a moving one (sand)
+        if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] != 0 and self.simulation.particles[(self.x, self.y + 1)].isFalling is False:
+            self.isFalling = False
+        elif self.y + 1 >= self.simulation.ROWS:
+            self.isFalling = False
+
+        if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] == 0:
+            self.isFalling = True
+
+        if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] in self.simulation.LIQUIDS + self.simulation.MOVING_SOLIDS and self.isFalling is False: # particle under is a moving one (sand)
             # #print("f")
             # if self.x + 1 < self.simulation.COLUMNS:
             #     right_below = self.simulation.map[self.y + 1][self.x + 1] in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS + self.simulation.LIQUIDS # checks if the particle should move down to the right
@@ -132,7 +137,7 @@ class WaterParticle:
         #         self.simulation.particles[(self.x - 1, self.y)] = self
         #         self.x -= 1
 
-        elif self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] not in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS: # water is on top of water or air
+        elif self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] not in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS + self.simulation.LIQUIDS: # water is on top of air
             self.simulation.map[self.y][self.x] = 0 # reset the current square
             self.simulation.map[self.y + 1][self.x] = 2 # add the sand back 1 square lower
             self.simulation.particles[(self.x, self.y)] = None
