@@ -34,6 +34,7 @@ class Simulation:
         print(self.particles)
         self.selected_material = SAND
         self.add_material_on = False
+        self.active_water_particles = 0
 
     def render(self):
         self.window.fill((33, 33, 33))
@@ -46,6 +47,8 @@ class Simulation:
         for value in self.particles.values():
             if value is not None:
                 value.rendered = False
+        print(self.active_water_particles)
+        self.active_water_particles = 0
 
     # Overrides the default events function in app.py
     def events(self):

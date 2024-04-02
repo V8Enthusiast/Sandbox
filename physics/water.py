@@ -17,6 +17,7 @@ class WaterParticle:
             pygame.draw.rect(self.simulation.window, self.color, rect)
             self.calculate_physics()
             self.rendered = True
+            self.simulation.active_water_particles += 1
 
     def calculate_physics(self):
         if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] != 0 and self.simulation.particles[(self.x, self.y + 1)].isFalling is False:
