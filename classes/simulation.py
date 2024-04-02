@@ -1,8 +1,7 @@
 import random
 
 import pygame
-from physics import sand
-from physics import water
+from physics import sand, water, stone
 
 # references used for clearer code
 AIR = 0
@@ -61,6 +60,8 @@ class Simulation:
                     self.selected_material = SAND
                 if event.key == pygame.K_2:
                     self.selected_material = WATER
+                if event.key == pygame.K_3:
+                    self.selected_material = STONE
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.add_material_on = True
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
@@ -94,3 +95,8 @@ class Simulation:
                             self.particles[(x, y)] = water.WaterParticle(self, x, y, (90, 188, 216))
                         except:
                             pass
+        if self.selected_material == STONE:
+            for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
+                for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
+                    self.map[y][x] = self.selected_material
+                    self.particles[(x, y)] = stone.StoneParticle(self, x, y, (136, 140, 141))
