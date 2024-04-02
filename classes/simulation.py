@@ -1,7 +1,7 @@
 import random
 
 import pygame
-from physics import sand, water, stone
+from physics import sand, water, stone, acid
 
 # references used for clearer code
 AIR = 0
@@ -18,7 +18,8 @@ class Simulation:
         self.gravity = 9.81
         self.SOLIDS = [STONE, WOOD]
         self.MOVING_SOLIDS = [SAND]
-        self.LIQUIDS = [WATER]
+        self.LIQUIDS = [WATER, ACID]
+        self.NON_DISSOLVABLE_PARTICLES = [ACID]
         self.window = self.app.screen
         self.buttons = []
         self.particle_size = 5 # the length of all particles (in pixels, 1 for perfect detail)
@@ -30,7 +31,6 @@ class Simulation:
         for y in range(self.ROWS):
             for x in range(self.COLUMNS):
                 self.particles[(x, y)] = None
-        print(self.particles)
         self.selected_material = SAND
         self.add_material_on = False
         self.active_water_particles = 0
@@ -46,7 +46,7 @@ class Simulation:
         for value in self.particles.values():
             if value is not None:
                 value.rendered = False
-        print(self.active_water_particles)
+        #print(self.active_water_particles)
         self.active_water_particles = 0
 
     # Overrides the default events function in app.py
@@ -62,6 +62,8 @@ class Simulation:
                     self.selected_material = WATER
                 if event.key == pygame.K_3:
                     self.selected_material = STONE
+                if event.key == pygame.K_4:
+                    self.selected_material = ACID
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.add_material_on = True
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
@@ -95,8 +97,19 @@ class Simulation:
                             self.particles[(x, y)] = water.WaterParticle(self, x, y, (90, 188, 216))
                         except:
                             pass
+
         if self.selected_material == STONE:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
                     self.map[y][x] = self.selected_material
                     self.particles[(x, y)] = stone.StoneParticle(self, x, y, (136, 140, 141))
+
+        if self.selected_material == ACID:
+            for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
+                for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
+                    if random.randint(0, 100) > 75:
+                        try:
+                            self.map[y][x] = self.selected_material
+                            self.particles[(x, y)] = acid.AcidParticle(self, x, y, (176, 191, 26))
+                        except:
+                            pass
