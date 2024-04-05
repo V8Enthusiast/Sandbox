@@ -24,6 +24,8 @@ class AcidParticle:
     def calculate_physics(self):
         if self.y + 1 < self.simulation.ROWS and ((self.simulation.map[self.y + 1][self.x] == 0 or self.simulation.particles[(self.x, self.y + 1)].isFalling) or (self.x + 1 < self.simulation.COLUMNS and (self.simulation.map[self.y + 1][self.x + 1] == 0 or self.simulation.particles[(self.x + 1, self.y + 1)].isFalling)) or (self.x - 1 >= 0 and (self.simulation.map[self.y + 1][self.x - 1] == 0 or self.simulation.particles[(self.x - 1, self.y + 1)].isFalling))):
             self.isFalling = True
+        if self.y - 1 >= 0 and (self.simulation.map[self.y - 1][self.x] not in self.simulation.LIQUIDS or (self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y - 1][self.x + 1] == 0) or (self.x - 1 >= 0 and self.simulation.map[self.y - 1][self.x - 1] == 0)):
+            self.isFalling = True
         if self.isFalling:
             if random.randint(0, 100) <= acid_strength:
                 isDissolving = True
@@ -31,8 +33,13 @@ class AcidParticle:
                 isDissolving = False
             # if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] in self.simulation.NON_DISSOLVABLE_PARTICLES and self.simulation.particles[(self.x, self.y + 1)].isFalling is False:
             #     self.isFalling = False
-            if self.y + 1 >= self.simulation.ROWS:
+            if self.y - 1 >= 0 and self.simulation.map[self.y - 1][self.x] != 0 and self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y - 1][self.x + 1] != 0 and self.x - 1 >= 0 and self.simulation.map[self.y - 1][self.x - 1] != 0:
                 self.isFalling = False
+                #self.color = (255, 255, 255)
+            elif self.y + 1 >= self.simulation.ROWS:
+                self.isFalling = False
+            # else:
+            #     self.color = (176, 191, 26)
 
             if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] != 0 and self.isFalling and (isDissolving is False or self.simulation.map[self.y + 1][self.x] in self.simulation.NON_DISSOLVABLE_PARTICLES): # particle under is a not air
 
@@ -91,6 +98,14 @@ class AcidParticle:
             elif self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] not in self.simulation.NON_DISSOLVABLE_PARTICLES and isDissolving:
                 print(self.simulation.map[self.y + 1][self.x])
                 self.simulation.map[self.y][self.x] = 0 # reset the current square
+                self.simulation.map[self.y + 1][self.x] = 4
+                self.simulation.particles[(self.x, self.y)] = None
+                self.simulation.particles[(self.x, self.y + 1)] = self
+                self.y += 1
+        if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] not in self.simulation.NON_DISSOLVABLE_PARTICLES:
+            if random.randint(0, 100) <= acid_strength:
+                print(self.simulation.map[self.y + 1][self.x])
+                self.simulation.map[self.y][self.x] = 0  # reset the current square
                 self.simulation.map[self.y + 1][self.x] = 4
                 self.simulation.particles[(self.x, self.y)] = None
                 self.simulation.particles[(self.x, self.y + 1)] = self
