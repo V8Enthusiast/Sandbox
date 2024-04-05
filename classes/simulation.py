@@ -1,7 +1,7 @@
 import random
 
 import pygame
-from physics import sand, water, stone, acid
+from physics import sand, water, stone, acid, plastic
 
 # references used for clearer code
 AIR = 0
@@ -9,17 +9,18 @@ SAND = 1
 WATER = 2
 STONE = 3
 ACID = 4
-FIRE = 5
-WOOD = 6
+PLASTIC = 5
+FIRE = 6
+WOOD = 7
 
 class Simulation:
     def __init__(self, app):
         self.app = app
         self.gravity = 9.81
-        self.SOLIDS = [STONE, WOOD]
+        self.SOLIDS = [STONE, WOOD, PLASTIC]
         self.MOVING_SOLIDS = [SAND]
         self.LIQUIDS = [WATER, ACID]
-        self.NON_DISSOLVABLE_PARTICLES = [ACID]
+        self.NON_DISSOLVABLE_PARTICLES = [ACID, PLASTIC]
         self.window = self.app.screen
         self.buttons = []
         self.particle_size = 5 # the length of all particles (in pixels, 1 for perfect detail)
@@ -64,6 +65,8 @@ class Simulation:
                     self.selected_material = STONE
                 if event.key == pygame.K_4:
                     self.selected_material = ACID
+                if event.key == pygame.K_5:
+                    self.selected_material = PLASTIC
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.add_material_on = True
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
@@ -113,3 +116,9 @@ class Simulation:
                             self.particles[(x, y)] = acid.AcidParticle(self, x, y, (176, 191, 26))
                         except:
                             pass
+
+        if self.selected_material == PLASTIC:
+            for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
+                for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
+                    self.map[y][x] = self.selected_material
+                    self.particles[(x, y)] = plastic.PlasticParticle(self, x, y, (215, 215, 215))
