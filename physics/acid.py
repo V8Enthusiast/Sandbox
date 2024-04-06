@@ -3,7 +3,7 @@ import random
 import functions
 
 acid_strength = 25
-max_acid_strength = 25
+max_acid_strength = 50
 ACID = 4
 
 class AcidParticle:
@@ -22,7 +22,7 @@ class AcidParticle:
         if self.rendered is False:
             print(self.strength)
             #self.color = (int(176 * self.strength / max_acid_strength), int(191 * self.strength / max_acid_strength), int(26 * self.strength / max_acid_strength))
-            self.color = functions.mix_colors((176, 191, 26), (90, 188, 216), self.strength/max_acid_strength) # color 1 is acid, color 2 is water
+            self.color = functions.mix_colors((0, 255, 0), (90, 188, 216), self.strength/max_acid_strength) # color 1 is acid, color 2 is water
             rect = pygame.Rect(0, 0, self.simulation.particle_size, self.simulation.particle_size)
             rect.center = (self.x * self.simulation.particle_size, self.y * self.simulation.particle_size)
             pygame.draw.rect(self.simulation.window, self.color, rect)
@@ -66,7 +66,7 @@ class AcidParticle:
 
     def replace_particle_with_acid(self, x, y, strength_increment):
         self.simulation.map[y][x] = ACID
-        self.simulation.particles[(x, y)] = AcidParticle(self.simulation, x, y,(10, 100, 10))
+        self.simulation.particles[(x, y)] = AcidParticle(self.simulation, x, y,(0, 255, 0))
         self.simulation.particles[(x, y)].strength = strength_increment
         self.strength -= strength_increment # remove the strength given to the particle from self
 

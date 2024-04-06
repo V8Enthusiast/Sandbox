@@ -114,7 +114,7 @@ class Simulation:
                     if random.randint(0, 100) > 75:
                         try:
                             self.map[y][x] = self.selected_material
-                            self.particles[(x, y)] = acid.AcidParticle(self, x, y, (176, 191, 26))
+                            self.particles[(x, y)] = acid.AcidParticle(self, x, y, (102, 242, 15))
                         except:
                             pass
 
