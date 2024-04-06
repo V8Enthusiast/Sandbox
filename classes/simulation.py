@@ -20,6 +20,7 @@ class Simulation:
         self.SOLIDS = [STONE, WOOD, PLASTIC]
         self.MOVING_SOLIDS = [SAND]
         self.LIQUIDS = [WATER, ACID]
+        self.NON_ACIDIC_LIQUIDS = [WATER]
         self.NON_DISSOLVABLE_PARTICLES = [ACID, PLASTIC]
         self.window = self.app.screen
         self.buttons = []

@@ -9,6 +9,7 @@ class WaterParticle:
         self.color = color
         self.rendered = False
         self.isFalling = True
+        self.strength = 0 # this is needed to calculate dissolving acid
 
     def render(self):
         if self.rendered is False:
@@ -20,8 +21,10 @@ class WaterParticle:
             self.simulation.active_water_particles += 1
 
     def calculate_physics(self):
+        # checks if at least one particle under is air
         if self.y + 1 < self.simulation.ROWS and ((self.simulation.map[self.y + 1][self.x] == 0 or self.simulation.particles[(self.x, self.y + 1)].isFalling) or (self.x + 1 < self.simulation.COLUMNS and (self.simulation.map[self.y + 1][self.x + 1] == 0 or self.simulation.particles[(self.x + 1, self.y + 1)].isFalling)) or (self.x - 1 >= 0 and (self.simulation.map[self.y + 1][self.x - 1] == 0 or self.simulation.particles[(self.x - 1, self.y + 1)].isFalling))):
             self.isFalling = True
+        # checks if the particle is covered by a liquid
         if self.y - 1 >= 0 and (self.simulation.map[self.y - 1][self.x] not in self.simulation.LIQUIDS or (self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y - 1][self.x + 1] == 0) or (self.x - 1 >= 0 and self.simulation.map[self.y - 1][self.x - 1] == 0)):
             self.isFalling = True
 

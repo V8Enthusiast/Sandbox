@@ -1,7 +1,10 @@
 import pygame
 import random
+import functions
 
 acid_strength = 25
+max_acid_strength = 25
+ACID = 4
 
 class AcidParticle:
     def __init__(self, simulation, x, y, color):
@@ -11,9 +14,15 @@ class AcidParticle:
         self.color = color
         self.rendered = False
         self.isFalling = True
+        self.strength = acid_strength
+        self.liquid_neighbour_count = 0 # amount of liquid particles neighbouring with the particle which have less strength than the current particle
+        self.avg_neighbour_strength = 0
 
     def render(self):
         if self.rendered is False:
+            print(self.strength)
+            #self.color = (int(176 * self.strength / max_acid_strength), int(191 * self.strength / max_acid_strength), int(26 * self.strength / max_acid_strength))
+            self.color = functions.mix_colors((176, 191, 26), (90, 188, 216), self.strength/max_acid_strength) # color 1 is acid, color 2 is water
             rect = pygame.Rect(0, 0, self.simulation.particle_size, self.simulation.particle_size)
             rect.center = (self.x * self.simulation.particle_size, self.y * self.simulation.particle_size)
             pygame.draw.rect(self.simulation.window, self.color, rect)
@@ -21,13 +30,65 @@ class AcidParticle:
             self.rendered = True
             self.simulation.active_water_particles += 1
 
+    def update_liquid_neighbour_count(self):
+        self.liquid_neighbour_count = 0
+        self.avg_neighbour_strength = 0
+        # above particle
+        if self.y - 1 >= 0 and self.simulation.map[self.y - 1][self.x] in self.simulation.LIQUIDS and self.simulation.particles[(self.x, self.y - 1)].strength < self.strength:
+            self.liquid_neighbour_count += 1
+            self.avg_neighbour_strength += self.simulation.particles[(self.x, self.y - 1)].strength
+            if self.x - 1 >= 0 and self.simulation.map[self.y - 1][self.x - 1] in self.simulation.LIQUIDS and self.simulation.particles[(self.x - 1, self.y - 1)].strength < self.strength:
+                self.liquid_neighbour_count += 1
+                self.avg_neighbour_strength += self.simulation.particles[(self.x - 1, self.y - 1)].strength
+            if self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y - 1][self.x + 1] in self.simulation.LIQUIDS and self.simulation.particles[(self.x + 1, self.y - 1)].strength < self.strength:
+                self.liquid_neighbour_count += 1
+                self.avg_neighbour_strength += self.simulation.particles[(self.x + 1, self.y - 1)].strength
+        # on the same level as particle
+        if self.x - 1 >= 0 and self.simulation.map[self.y][self.x - 1] in self.simulation.LIQUIDS and self.simulation.particles[(self.x - 1, self.y)].strength < self.strength:
+            self.liquid_neighbour_count += 1
+            self.avg_neighbour_strength += self.simulation.particles[(self.x - 1, self.y)].strength
+        if self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y][self.x + 1] in self.simulation.LIQUIDS and self.simulation.particles[(self.x + 1, self.y)].strength < self.strength:
+            self.liquid_neighbour_count += 1
+            self.avg_neighbour_strength += self.simulation.particles[(self.x + 1, self.y)].strength
+        # below particle
+        if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] in self.simulation.LIQUIDS and self.simulation.particles[(self.x, self.y + 1)].strength < self.strength:
+            self.liquid_neighbour_count += 1
+            self.avg_neighbour_strength += self.simulation.particles[(self.x, self.y + 1)].strength
+            if self.x - 1 >= 0 and self.simulation.map[self.y + 1][self.x - 1] in self.simulation.LIQUIDS and self.simulation.particles[(self.x - 1, self.y + 1)].strength < self.strength:
+                self.liquid_neighbour_count += 1
+                self.avg_neighbour_strength += self.simulation.particles[(self.x - 1, self.y + 1)].strength
+            if self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y + 1][self.x + 1] in self.simulation.LIQUIDS and self.simulation.particles[(self.x + 1, self.y + 1)].strength < self.strength:
+                self.liquid_neighbour_count += 1
+                self.avg_neighbour_strength += self.simulation.particles[(self.x + 1, self.y + 1)].strength
+
+        self.avg_neighbour_strength += self.strength
+        self.avg_neighbour_strength /= self.liquid_neighbour_count + 1
+
+    def replace_particle_with_acid(self, x, y, strength_increment):
+        self.simulation.map[y][x] = ACID
+        self.simulation.particles[(x, y)] = AcidParticle(self.simulation, x, y,(10, 100, 10))
+        self.simulation.particles[(x, y)].strength = strength_increment
+        self.strength -= strength_increment # remove the strength given to the particle from self
+
+    def add_acid_strength_to_particle(self, x, y, strength_increment, avg_strength):
+        if self.simulation.particles[(x, y)].strength + strength_increment > avg_strength:
+            strength_increment = avg_strength - self.simulation.particles[(x, y)].strength
+            if strength_increment < 0:
+                strength_increment = 0
+            self.simulation.particles[(x, y)].strength = avg_strength
+        else:
+            self.simulation.particles[(x, y)].strength += strength_increment
+        self.strength -= strength_increment # remove the strength given to the particle from self
+
     def calculate_physics(self):
+        # checks if at least one particle under is air
         if self.y + 1 < self.simulation.ROWS and ((self.simulation.map[self.y + 1][self.x] == 0 or self.simulation.particles[(self.x, self.y + 1)].isFalling) or (self.x + 1 < self.simulation.COLUMNS and (self.simulation.map[self.y + 1][self.x + 1] == 0 or self.simulation.particles[(self.x + 1, self.y + 1)].isFalling)) or (self.x - 1 >= 0 and (self.simulation.map[self.y + 1][self.x - 1] == 0 or self.simulation.particles[(self.x - 1, self.y + 1)].isFalling))):
             self.isFalling = True
+        # checks if the particle is covered by a liquid
         if self.y - 1 >= 0 and (self.simulation.map[self.y - 1][self.x] not in self.simulation.LIQUIDS or (self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y - 1][self.x + 1] == 0) or (self.x - 1 >= 0 and self.simulation.map[self.y - 1][self.x - 1] == 0)):
             self.isFalling = True
         if self.isFalling:
-            if random.randint(0, 100) <= acid_strength:
+            if random.randint(0, 100) <= self.strength:
                 isDissolving = True
             else:
                 isDissolving = False
@@ -35,9 +96,11 @@ class AcidParticle:
             #     self.isFalling = False
             if self.y - 1 >= 0 and self.simulation.map[self.y - 1][self.x] != 0 and self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y - 1][self.x + 1] != 0 and self.x - 1 >= 0 and self.simulation.map[self.y - 1][self.x - 1] != 0:
                 self.isFalling = False
+                self.update_liquid_neighbour_count()
                 #self.color = (255, 255, 255)
             elif self.y + 1 >= self.simulation.ROWS:
                 self.isFalling = False
+                self.update_liquid_neighbour_count()
             # else:
             #     self.color = (176, 191, 26)
 
@@ -102,8 +165,89 @@ class AcidParticle:
                 self.simulation.particles[(self.x, self.y)] = None
                 self.simulation.particles[(self.x, self.y + 1)] = self
                 self.y += 1
+        self.update_liquid_neighbour_count()
+        if self.liquid_neighbour_count > 0:
+            avg_strength = self.avg_neighbour_strength
+            strength_increment = (self.strength - avg_strength) / (self.liquid_neighbour_count + 1)
+
+            # particles above self
+            if self.y - 1 >= 0:
+
+                # particle above is less acidic than self
+                if self.simulation.map[self.y - 1][self.x] in self.simulation.NON_ACIDIC_LIQUIDS:
+                    # replace the particle with acid
+                    self.replace_particle_with_acid(self.x, self.y - 1, strength_increment)
+                elif self.simulation.map[self.y - 1][self.x] == ACID and self.simulation.particles[(self.x, self.y - 1)].strength < avg_strength:
+                    # add strength to the acid at that square
+                    self.add_acid_strength_to_particle(self.x, self.y - 1, strength_increment, avg_strength)
+
+                # particle to the left and up is less acidic than self
+                if self.x - 1 >= 0 and self.simulation.map[self.y - 1][self.x - 1] in self.simulation.NON_ACIDIC_LIQUIDS:
+                    # replace the particle with acid
+                    self.replace_particle_with_acid(self.x - 1, self.y - 1, strength_increment)
+                elif self.x - 1 >= 0 and self.simulation.map[self.y - 1][self.x - 1] == ACID and self.simulation.particles[(self.x - 1, self.y - 1)].strength < avg_strength:
+                    # add strength to the acid at that square
+                    self.add_acid_strength_to_particle(self.x - 1, self.y - 1, strength_increment, avg_strength)
+
+                # particle to the right and up is less acidic than self
+                if self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y - 1][self.x + 1] in self.simulation.NON_ACIDIC_LIQUIDS:
+                    # add strength to the acid at that square
+                    self.replace_particle_with_acid(self.x + 1, self.y - 1, strength_increment)
+                elif self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y - 1][self.x + 1] == ACID and self.simulation.particles[(self.x + 1, self.y - 1)].strength < avg_strength:
+                    # add strength to the acid at that square
+                    self.add_acid_strength_to_particle(self.x + 1, self.y - 1, strength_increment, avg_strength)
+
+
+            # particles on the same y-level as self
+
+            # particle to the left is less acidic than self
+            if self.x - 1 >= 0 and self.simulation.map[self.y][self.x - 1] in self.simulation.NON_ACIDIC_LIQUIDS:
+                # replace the particle with acid
+                self.replace_particle_with_acid(self.x - 1, self.y, strength_increment)
+            elif self.x - 1 >= 0 and self.simulation.map[self.y][self.x - 1] == ACID and self.simulation.particles[(self.x - 1, self.y)].strength < avg_strength:
+                # add strength to the acid at that square
+                self.add_acid_strength_to_particle(self.x - 1, self.y, strength_increment, avg_strength)
+
+            # particle to the right is less acidic than self
+            if self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y][self.x + 1] in self.simulation.NON_ACIDIC_LIQUIDS:
+                # add strength to the acid at that square
+                self.replace_particle_with_acid(self.x + 1, self.y, strength_increment)
+            elif self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y][self.x + 1] == ACID and self.simulation.particles[(self.x + 1, self.y)].strength < avg_strength:
+                # add strength to the acid at that square
+                self.add_acid_strength_to_particle(self.x + 1, self.y, strength_increment, avg_strength)
+
+            # particles under self
+            if self.y + 1 < self.simulation.ROWS:
+
+                # particle under is less acidic than self
+                if self.simulation.map[self.y + 1][self.x] in self.simulation.NON_ACIDIC_LIQUIDS:
+                    # replace the particle with acid
+                    self.replace_particle_with_acid(self.x, self.y + 1, strength_increment)
+                elif self.simulation.map[self.y + 1][self.x] == ACID and self.simulation.particles[(self.x, self.y + 1)].strength < avg_strength:
+                    # add strength to the acid at that square
+                    self.add_acid_strength_to_particle(self.x, self.y + 1, strength_increment, avg_strength)
+
+                # particle to the left and down is less acidic than self
+                if self.x - 1 >= 0 and self.simulation.map[self.y + 1][self.x - 1] in self.simulation.NON_ACIDIC_LIQUIDS:
+                    # replace the particle with acid
+                    self.replace_particle_with_acid(self.x - 1, self.y + 1, strength_increment)
+                elif self.x - 1 >= 0 and self.simulation.map[self.y + 1][self.x - 1] == ACID and self.simulation.particles[(self.x - 1, self.y + 1)].strength < avg_strength:
+                    # add strength to the acid at that square
+                    self.add_acid_strength_to_particle(self.x - 1, self.y + 1, strength_increment, avg_strength)
+
+                # particle to the right and down is less acidic than self
+                if self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y + 1][self.x + 1] in self.simulation.NON_ACIDIC_LIQUIDS:
+                    # add strength to the acid at that square
+                    self.replace_particle_with_acid(self.x + 1, self.y + 1, strength_increment)
+                elif self.x + 1 < self.simulation.COLUMNS and self.simulation.map[self.y + 1][self.x + 1] == ACID and self.simulation.particles[(self.x + 1, self.y + 1)].strength < avg_strength:
+                    # add strength to the acid at that square
+                    self.add_acid_strength_to_particle(self.x + 1, self.y + 1, strength_increment, avg_strength)
+
+
+
+
         if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] not in self.simulation.NON_DISSOLVABLE_PARTICLES:
-            if random.randint(0, 100) <= acid_strength:
+            if random.randint(0, 100) <= self.strength:
                 print(self.simulation.map[self.y + 1][self.x])
                 self.simulation.map[self.y][self.x] = 0  # reset the current square
                 self.simulation.map[self.y + 1][self.x] = 4
