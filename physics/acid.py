@@ -20,7 +20,6 @@ class AcidParticle:
 
     def render(self):
         if self.rendered is False:
-            print(self.strength)
             #self.color = (int(176 * self.strength / max_acid_strength), int(191 * self.strength / max_acid_strength), int(26 * self.strength / max_acid_strength))
             self.color = functions.mix_colors((0, 255, 0), (90, 188, 216), self.strength/max_acid_strength) # color 1 is acid, color 2 is water
             rect = pygame.Rect(0, 0, self.simulation.particle_size, self.simulation.particle_size)
@@ -248,7 +247,6 @@ class AcidParticle:
 
         if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] not in self.simulation.NON_DISSOLVABLE_PARTICLES:
             if random.randint(0, 100) <= self.strength:
-                print(self.simulation.map[self.y + 1][self.x])
                 self.simulation.map[self.y][self.x] = 0  # reset the current square
                 self.simulation.map[self.y + 1][self.x] = 4
                 self.simulation.particles[(self.x, self.y)] = None

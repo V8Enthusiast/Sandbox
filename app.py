@@ -8,6 +8,7 @@ class App:
         self.fps = 60
         self.width = width
         self.height = height
+        self.hotbar_height = 150
         self.is_FS_enabled = fullscreen
         self.is_vsync_enabled = vsync
         self.scale = 1
@@ -19,9 +20,9 @@ class App:
 
         # Window setup
         if fullscreen:
-            self.screen = pygame.display.set_mode((width, height), pygame.FULLSCREEN, vsync=int(vsync))
+            self.screen = pygame.display.set_mode((width, height + self.hotbar_height), pygame.FULLSCREEN, vsync=int(vsync))
         else:
-            self.screen = pygame.display.set_mode((width, height), vsync=int(vsync))
+            self.screen = pygame.display.set_mode((width, height + self.hotbar_height), vsync=int(vsync))
 
         self.run = True # Variable to determine if the app is running
 
@@ -46,7 +47,7 @@ class App:
         pygame.display.update()
     def mainloop(self):
         self.clock.tick(self.fps)
-        #print(self.clock.get_fps())
+        print(self.clock.get_fps())
         if self.run is False:
             pygame.quit()
         self.background()

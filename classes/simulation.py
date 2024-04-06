@@ -50,6 +50,11 @@ class Simulation:
                 value.rendered = False
         #print(self.active_water_particles)
         self.active_water_particles = 0
+        self.render_hotbar()
+
+    def render_hotbar(self):
+        hotbar_rect = pygame.Rect(0, self.app.height - 2, self.app.width, self.app.hotbar_height)
+        pygame.draw.rect(self.window, (150, 150, 150) ,hotbar_rect)
 
     # Overrides the default events function in app.py
     def events(self):
