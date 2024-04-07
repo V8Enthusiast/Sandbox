@@ -1,7 +1,8 @@
 import random
 
 import pygame
-from physics import sand, water, stone, acid, plastic
+from physics import sand, water, stone, acid, plastic, fire
+import functions
 
 # references used for clearer code
 AIR = 0
@@ -17,6 +18,7 @@ class Simulation:
     def __init__(self, app):
         self.app = app
         self.gravity = 9.81
+        self.base_temp = 20
         self.SOLIDS = [STONE, WOOD, PLASTIC]
         self.MOVING_SOLIDS = [SAND]
         self.LIQUIDS = [WATER, ACID]
@@ -28,6 +30,7 @@ class Simulation:
         self.COLUMNS = self.app.width // self.particle_size
         self.ROWS = self.app.height // self.particle_size
         self.map = [[AIR for _ in range(self.COLUMNS)] for i in range(self.ROWS)]
+        self.heat_map = [[20 for _ in range(self.COLUMNS)] for i in range(self.ROWS)]
         self.particles = {}
         self.place_radius = 1
         for y in range(self.ROWS):
@@ -43,8 +46,25 @@ class Simulation:
             self.add_material()
         for y in range(1, self.ROWS + 1):
             for x in range(1, self.COLUMNS + 1):
-                if self.particles[(self.COLUMNS - x, self.ROWS - y)] is not None:
-                    self.particles[(self.COLUMNS - x, self.ROWS - y)].render()
+                r = self.ROWS - y
+                c = self.COLUMNS - x
+                if self.particles[(c, r)] is not None:
+                    self.particles[(c, r)].render()
+                else:
+                    if r + 1 < self.ROWS and self.heat_map[r + 1][c] > self.heat_map[r][c]:
+                        diff = self.heat_map[r + 1][c] - self.heat_map[r][c]
+                        self.heat_map[r + 1][c] -= diff
+                        self.heat_map[r][c] += diff
+                    if self.heat_map[r][c] != self.base_temp:
+                        # heat visualization
+                        scale = self.heat_map[r][c]/100
+                        if scale > 1:
+                            scale = 1
+                        color = functions.mix_colors((255, 0, 0), (15, 15, 15), scale)
+                        rect = pygame.Rect(0, 0, self.particle_size, self.particle_size)
+                        rect.center = ((c) * self.particle_size, (r) * self.particle_size)
+                        pygame.draw.rect(self.window, color, rect)
+
         for value in self.particles.values():
             if value is not None:
                 value.rendered = False
@@ -73,6 +93,8 @@ class Simulation:
                     self.selected_material = ACID
                 if event.key == pygame.K_5:
                     self.selected_material = PLASTIC
+                if event.key == pygame.K_6:
+                    self.selected_material = FIRE
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.add_material_on = True
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
@@ -128,3 +150,9 @@ class Simulation:
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
                     self.map[y][x] = self.selected_material
                     self.particles[(x, y)] = plastic.PlasticParticle(self, x, y, (215, 215, 215))
+
+        if self.selected_material == FIRE:
+            for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
+                for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
+                    self.map[y][x] = self.selected_material
+                    self.particles[(x, y)] = fire.FireParticle(self, x, y, (222, 64, 24))
