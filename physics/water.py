@@ -1,6 +1,6 @@
 import pygame
 import random
-from physics import plastic, oil
+from physics import plastic, oil, smoke
 
 FIRE = 6
 OIL = 8
@@ -29,15 +29,21 @@ class WaterParticle:
             self.simulation.particles[(x, y)].isOnFire = False
             self.simulation.map[self.y][self.x] = 0  # reset the current square
             self.simulation.particles[(self.x, self.y)] = None
+            self.simulation.smoke_map[y][x] = 1
+            self.simulation.smoke_particles[(x, y)] = smoke.SmokeParticle(self.simulation, x, y)
         elif self.simulation.particles[(x, y)].burning_material is not None:
             self.simulation.map[self.y][self.x] = 0  # reset the current square
-            self.simulation.map[y][x] = self.simulation.particles[(x, y)].burning_material  # add smoke here
+            self.simulation.map[y][x] = self.simulation.particles[(x, y)].burning_material
+            self.simulation.smoke_map[y][x] = 1
+            self.simulation.smoke_particles[(x, y)] = smoke.SmokeParticle(self.simulation, x, y)
             self.simulation.particles[(self.x, self.y)] = None
             if self.simulation.particles[(x, y)].burning_material == 5: # Plastic
                 self.simulation.particles[(x, y)] = plastic.PlasticParticle(self.simulation, x, y, self.simulation.particles[(x, y)].burning_material_color)
         else:
             self.simulation.map[self.y][self.x] = 0  # reset the current square
-            self.simulation.map[y][x] = 0  # add smoke here
+            self.simulation.map[y][x] = 0
+            self.simulation.smoke_map[y][x] = 1
+            self.simulation.smoke_particles[(x, y)] = smoke.SmokeParticle(self.simulation, x, y)
             self.simulation.particles[(self.x, self.y)] = None
             self.simulation.particles[(x, y)] = None
 

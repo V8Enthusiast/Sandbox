@@ -38,11 +38,14 @@ class Simulation:
         self.ROWS = self.app.height // self.particle_size
         self.map = [[AIR for _ in range(self.COLUMNS)] for i in range(self.ROWS)]
         self.heat_map = [[20 for _ in range(self.COLUMNS)] for i in range(self.ROWS)]
+        self.smoke_map = [[0 for _ in range(self.COLUMNS)] for i in range(self.ROWS)]
         self.particles = {}
+        self.smoke_particles = {}
         self.place_radius = 1
         for y in range(self.ROWS):
             for x in range(self.COLUMNS):
                 self.particles[(x, y)] = None
+                self.smoke_particles[(x, y)] = None
         self.selected_material = SAND
         self.add_material_on = False
         self.active_water_particles = 0
@@ -103,11 +106,16 @@ class Simulation:
                         self.draw_heat(r + 1, c)
                         self.draw_heat(r + 1, c - 1)
                         self.draw_heat(r + 1, c + 1)
+                if self.smoke_map[r][c] != 0:
+                    self.smoke_particles[(c, r)].render()
 
         if continue_calculating_heat is False:
             self.calculate_heat = False
 
         for value in self.particles.values():
+            if value is not None:
+                value.rendered = False
+        for value in self.smoke_particles.values():
             if value is not None:
                 value.rendered = False
         #print(self.active_water_particles)
