@@ -1,6 +1,7 @@
 import pygame
 import random
 import functions
+from physics import ash
 
 fire_detail = 1
 colors = [(222, 64, 24), (222, 126, 24)]
@@ -16,6 +17,7 @@ class FireParticle:
         self.part_size = self.simulation.particle_size // fire_detail
         self.fuel_left = 15
         self.start_fuel = 15
+        self.chance_to_leave_ash = 0
     def render(self):
         if self.rendered is False:
             for r in range(fire_detail):
@@ -31,13 +33,17 @@ class FireParticle:
             self.rendered = True
 
     def swap_particle_with_fire(self, x, y):
-        if random.randint(0, 1000) > self.simulation.particles[(x, y)].flammability:
+        if random.randint(0, 1000) < self.simulation.particles[(x, y)].flammability:
             self.simulation.map[y][x] = 6
             fuel = self.simulation.particles[(x, y)].fuel
             color = self.simulation.particles[(x, y)].color
+            chance_to_leave_ash = self.simulation.particles[(x, y)].chance_to_leave_ash_particle
             self.simulation.particles[(x, y)] = FireParticle(self.simulation, x, y, color)
             self.simulation.particles[(x, y)].fuel_left = fuel
             self.simulation.particles[(x, y)].start_fuel = fuel
+            if chance_to_leave_ash > 0:
+                self.simulation.particles[(x, y)].chance_to_leave_ash = chance_to_leave_ash
+
 
     def spread_fire(self):
         # above particle
@@ -69,8 +75,13 @@ class FireParticle:
         if self.fuel_left > 0:
             self.simulation.heat_map[self.y - 1][self.x] += 5
             self.fuel_left -= 1
-            self.burning_material_color = functions.mix_colors(self.burning_material_color,(10, 10, 10), self.fuel_left / self.start_fuel)
+            if self.burning_material_color != self.simulation.bg_color:
+                self.burning_material_color = functions.mix_colors(self.burning_material_color,(10, 10, 10), self.fuel_left / self.start_fuel)
         else:
-            self.simulation.map[self.y][self.x] = 0
-            self.simulation.particles[(self.x, self.y)] = None
+            if self.chance_to_leave_ash > 0 and random.randint(0, 100) < self.chance_to_leave_ash:
+                self.simulation.map[self.y][self.x] = 9
+                self.simulation.particles[(self.x, self.y)] = ash.AshParticle(self.simulation, self.x, self.y, (0, 0, 0))
+            else:
+                self.simulation.map[self.y][self.x] = 0
+                self.simulation.particles[(self.x, self.y)] = None
 

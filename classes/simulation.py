@@ -14,6 +14,7 @@ PLASTIC = 5
 FIRE = 6
 WOOD = 7
 OIL = 8
+ASH = 9
 
 class Simulation:
     def __init__(self, app):
@@ -25,7 +26,7 @@ class Simulation:
         self.calculate_heat = False
         self.view_heat = False
         self.SOLIDS = [STONE, WOOD, PLASTIC]
-        self.MOVING_SOLIDS = [SAND]
+        self.MOVING_SOLIDS = [SAND, ASH]
         self.LIQUIDS = [WATER, ACID]
         self.NON_ACIDIC_LIQUIDS = [WATER]
         self.NON_DISSOLVABLE_PARTICLES = [ACID, PLASTIC]

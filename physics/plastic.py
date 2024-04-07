@@ -10,7 +10,8 @@ class PlasticParticle:
         self.rendered = False
         self.isFalling = False
         self.fuel = 100 # this variable determines how long the particle will burn if set on fire
-        self.flammability = 950 # (0, 1000) this variable determines how easily the particle will catch on fire smaller values mean higher flammability
+        self.flammability = 50 # (0, 1000) this variable determines how easily the particle will catch on fire
+        self.chance_to_leave_ash_particle = 30 # (0, 100) variable determines how often the particle leaves ash when finished burning (0 for no ash)
     def render(self):
         if self.rendered is False:
             rect = pygame.Rect(0, 0, self.simulation.particle_size, self.simulation.particle_size)
