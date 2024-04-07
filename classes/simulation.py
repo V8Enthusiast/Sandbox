@@ -40,6 +40,16 @@ class Simulation:
         self.add_material_on = False
         self.active_water_particles = 0
 
+    def draw_heat(self, r, c):
+        # heat visualization
+        scale = self.heat_map[r][c] / 400
+        if scale > 1:
+            scale = 1
+        color = functions.mix_colors((255, 0, 0), (33, 33, 33), scale)
+        rect = pygame.Rect(0, 0, self.particle_size, self.particle_size)
+        rect.center = ((c) * self.particle_size, (r) * self.particle_size)
+        pygame.draw.rect(self.window, color, rect)
+
     def render(self):
         self.window.fill((33, 33, 33))
         if self.add_material_on:
@@ -48,22 +58,27 @@ class Simulation:
             for x in range(1, self.COLUMNS + 1):
                 r = self.ROWS - y
                 c = self.COLUMNS - x
+
+                # heat
+                if r + 1 < self.ROWS and self.heat_map[r + 1][c] > self.heat_map[r][c]:
+                    diff = self.heat_map[r + 1][c] - self.heat_map[r][c]
+                    self.heat_map[r + 1][c] -= diff // 2
+                    self.heat_map[r][c] += diff // 2
+                    # print(self.heat_map[r][c])
+
+                if r + 1 < self.ROWS and self.heat_map[r + 1][c] < self.heat_map[r][c] and self.map[r + 1][c] != FIRE:
+                    diff = self.heat_map[r][c] - self.heat_map[r + 1][c]
+                    # self.heat_map[r + 1][c] -= diff // 2
+                    print(f'Before: {self.heat_map[r][c]}')
+                    self.heat_map[r][c] -= diff / 2
+                    print(f'After: {self.heat_map[r][c]}')
+
                 if self.particles[(c, r)] is not None:
                     self.particles[(c, r)].render()
                 else:
-                    if r + 1 < self.ROWS and self.heat_map[r + 1][c] > self.heat_map[r][c]:
-                        diff = self.heat_map[r + 1][c] - self.heat_map[r][c]
-                        self.heat_map[r + 1][c] -= diff
-                        self.heat_map[r][c] += diff
                     if self.heat_map[r][c] != self.base_temp:
-                        # heat visualization
-                        scale = self.heat_map[r][c]/100
-                        if scale > 1:
-                            scale = 1
-                        color = functions.mix_colors((255, 0, 0), (15, 15, 15), scale)
-                        rect = pygame.Rect(0, 0, self.particle_size, self.particle_size)
-                        rect.center = ((c) * self.particle_size, (r) * self.particle_size)
-                        pygame.draw.rect(self.window, color, rect)
+                        self.draw_heat(r, c)
+                        self.draw_heat(r + 1, c)
 
         for value in self.particles.values():
             if value is not None:

@@ -23,6 +23,7 @@ class FireParticle:
                         pygame.draw.rect(self.simulation.window, random.choice(colors), rect)
             self.calculate_physics()
             self.rendered = True
+            print("dsdsd")
 
     def calculate_physics(self):
-        self.simulation.heat_map[self.y - 1][self.x] += 1
+        self.simulation.heat_map[self.y - 1][self.x] += 5
