@@ -1,7 +1,7 @@
 import random
 
 import pygame
-from physics import sand, water, stone, acid, plastic, fire
+from physics import sand, water, stone, acid, plastic, fire, oil
 import functions
 
 # references used for clearer code
@@ -54,7 +54,7 @@ class Simulation:
             scale = 1
         color = functions.mix_colors((255, 0, 0), self.bg_color, scale)
         rect = pygame.Rect(0, 0, self.particle_size, self.particle_size)
-        rect.center = ((c) * self.particle_size, (r) * self.particle_size)
+        rect.center = (c * self.particle_size, r * self.particle_size)
         pygame.draw.rect(self.window, color, rect)
 
     def render(self):
@@ -137,6 +137,8 @@ class Simulation:
                     self.selected_material = PLASTIC
                 if event.key == pygame.K_6:
                     self.selected_material = FIRE
+                if event.key == pygame.K_7:
+                    self.selected_material = OIL
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.add_material_on = True
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
@@ -199,3 +201,12 @@ class Simulation:
                     self.map[y][x] = self.selected_material
                     self.particles[(x, y)] = fire.FireParticle(self, x, y, self.bg_color)
                     self.calculate_heat = True
+        if self.selected_material == OIL:
+            for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
+                for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
+                    if random.randint(0, 100) > 10:
+                        try:
+                            self.map[y][x] = self.selected_material
+                            self.particles[(x, y)] = oil.OilParticle(self, x, y, (69, 45, 19))
+                        except:
+                            pass

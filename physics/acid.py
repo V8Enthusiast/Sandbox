@@ -103,7 +103,7 @@ class AcidParticle:
             # else:
             #     self.color = (176, 191, 26)
 
-            if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] != 0 and self.isFalling and (isDissolving is False or self.simulation.map[self.y + 1][self.x] in self.simulation.NON_DISSOLVABLE_PARTICLES): # particle under is a not air
+            if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] != 0 and self.isFalling and (isDissolving is False or self.simulation.map[self.y + 1][self.x] in self.simulation.NON_DISSOLVABLE_PARTICLES): # particle under is not air
 
                 # to the right
                 first_empty_particle_right_x = None
