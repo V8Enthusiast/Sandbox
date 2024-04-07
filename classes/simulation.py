@@ -19,6 +19,9 @@ class Simulation:
         self.app = app
         self.gravity = 9.81
         self.base_temp = 20
+        self.heat_width = 90 # the higher this value is, the narrower the heat will be
+        self.calculate_heat = False
+        self.view_heat = False
         self.SOLIDS = [STONE, WOOD, PLASTIC]
         self.MOVING_SOLIDS = [SAND]
         self.LIQUIDS = [WATER, ACID]
@@ -54,31 +57,51 @@ class Simulation:
         self.window.fill((33, 33, 33))
         if self.add_material_on:
             self.add_material()
+        continue_calculating_heat = False
         for y in range(1, self.ROWS + 1):
             for x in range(1, self.COLUMNS + 1):
                 r = self.ROWS - y
                 c = self.COLUMNS - x
 
-                # heat
-                if r + 1 < self.ROWS and self.heat_map[r + 1][c] > self.heat_map[r][c]:
-                    diff = self.heat_map[r + 1][c] - self.heat_map[r][c]
-                    self.heat_map[r + 1][c] -= diff // 2
-                    self.heat_map[r][c] += diff // 2
-                    # print(self.heat_map[r][c])
+                if self.calculate_heat:
+                    if self.heat_map[r][c] != self.base_temp:
+                        continue_calculating_heat = True
+                    # heat
+                    if r + 1 < self.ROWS and self.heat_map[r + 1][c] > self.heat_map[r][c]:
+                        diff = self.heat_map[r + 1][c] - self.heat_map[r][c]
+                        self.heat_map[r + 1][c] -= diff // 2
+                        self.heat_map[r][c] += diff // 2
+                        # print(self.heat_map[r][c])
+                    if r + 1 < self.ROWS and c + 1 < self.COLUMNS and self.heat_map[r + 1][c + 1] > self.heat_map[r][c] and random.randint(0, 100) > self.heat_width:
+                        diff = self.heat_map[r + 1][c + 1] - self.heat_map[r][c]
+                        self.heat_map[r + 1][c + 1] -= diff // 2
+                        self.heat_map[r][c] += diff // 2
+                        # print(self.heat_map[r][c])
+                    if r + 1 < self.ROWS and c - 1 >= 0 and self.heat_map[r + 1][c - 1] > self.heat_map[r][c] and random.randint(0, 100) > self.heat_width:
+                        diff = self.heat_map[r + 1][c - 1] - self.heat_map[r][c]
+                        self.heat_map[r + 1][c - 1] -= diff // 2
+                        self.heat_map[r][c] += diff // 2
+                        # print(self.heat_map[r][c])
 
-                if r + 1 < self.ROWS and self.heat_map[r + 1][c] < self.heat_map[r][c] and self.map[r + 1][c] != FIRE:
-                    diff = self.heat_map[r][c] - self.heat_map[r + 1][c]
-                    # self.heat_map[r + 1][c] -= diff // 2
-                    print(f'Before: {self.heat_map[r][c]}')
-                    self.heat_map[r][c] -= diff / 2
-                    print(f'After: {self.heat_map[r][c]}')
+
+                    if r + 1 < self.ROWS and self.heat_map[r + 1][c] < self.heat_map[r][c] and self.map[r + 1][c] != FIRE and ((c + 1 < self.COLUMNS and self.heat_map[r + 1][c + 1] < self.heat_map[r][c] and self.map[r + 1][c + 1] != FIRE) or c + 1 >= self.COLUMNS) and ((c - 1 >= 0 and self.heat_map[r + 1][c - 1] < self.heat_map[r][c] and self.map[r + 1][c - 1] != FIRE) or c - 1 < 0):
+                        diff = self.heat_map[r][c] - self.heat_map[r + 1][c]
+                        # self.heat_map[r + 1][c] -= diff // 2
+                        #print(f'Before: {self.heat_map[r][c]}')
+                        self.heat_map[r][c] -= diff / 2
+                        #print(f'After: {self.heat_map[r][c]}')
 
                 if self.particles[(c, r)] is not None:
                     self.particles[(c, r)].render()
-                else:
+                elif self.view_heat:
                     if self.heat_map[r][c] != self.base_temp:
                         self.draw_heat(r, c)
                         self.draw_heat(r + 1, c)
+                        self.draw_heat(r + 1, c - 1)
+                        self.draw_heat(r + 1, c + 1)
+
+        if continue_calculating_heat is False:
+            self.calculate_heat = False
 
         for value in self.particles.values():
             if value is not None:
@@ -171,3 +194,4 @@ class Simulation:
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
                     self.map[y][x] = self.selected_material
                     self.particles[(x, y)] = fire.FireParticle(self, x, y, (222, 64, 24))
+                    self.calculate_heat = True
