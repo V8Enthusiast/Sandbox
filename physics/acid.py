@@ -1,10 +1,13 @@
 import pygame
 import random
 import functions
+from physics import plastic
 
 acid_strength = 25
 max_acid_strength = 50
 ACID = 4
+OIL = 8
+FIRE = 6
 
 class AcidParticle:
     def __init__(self, simulation, x, y, color):
@@ -28,6 +31,24 @@ class AcidParticle:
             self.calculate_physics()
             self.rendered = True
             self.simulation.active_water_particles += 1
+
+    def put_out_fire(self, x, y):
+        if self.simulation.map[y][x] == OIL:
+            self.simulation.particles[(x, y)].isOnFire = False
+            self.simulation.map[self.y][self.x] = 0  # reset the current square
+            self.simulation.particles[(self.x, self.y)] = None
+        elif self.simulation.particles[(x, y)].burning_material is not None:
+            self.simulation.map[self.y][self.x] = 0  # reset the current square
+            self.simulation.map[y][x] = self.simulation.particles[(x, y)].burning_material  # add smoke here
+            self.simulation.particles[(self.x, self.y)] = None
+            if self.simulation.particles[(x, y)].burning_material == 5: # Plastic
+                self.simulation.particles[(x, y)] = plastic.PlasticParticle(self.simulation, x, y, self.simulation.particles[(x, y)].burning_material_color)
+        else:
+            self.simulation.map[self.y][self.x] = 0  # reset the current square
+            self.simulation.map[y][x] = 0  # add smoke here
+            self.simulation.particles[(self.x, self.y)] = None
+            self.simulation.particles[(x, y)] = None
+
 
     def update_liquid_neighbour_count(self):
         self.liquid_neighbour_count = 0
@@ -111,6 +132,9 @@ class AcidParticle:
                     if self.simulation.map[self.y + 1][self.x + i] == 0:
                         first_empty_particle_right_x = self.x + i
                         break
+                    elif self.simulation.map[self.y + 1][self.x + i] == FIRE or (self.simulation.map[self.y + 1][self.x + i] == OIL and self.simulation.particles[(self.x + i, self.y + 1)].isOnFire):
+                        self.put_out_fire(self.x + i, self.y + 1)
+                        break
                     if self.simulation.map[self.y + 1][self.x + i] in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS:
                         break
 
@@ -119,6 +143,9 @@ class AcidParticle:
                 for n in range(1, self.x):
                     if self.simulation.map[self.y + 1][self.x - n] == 0:
                         first_empty_particle_left_x = self.x - n
+                        break
+                    elif self.simulation.map[self.y + 1][self.x - n] == FIRE or (self.simulation.map[self.y + 1][self.x - n] == OIL and self.simulation.particles[(self.x - n, self.y + 1)].isOnFire):
+                        self.put_out_fire(self.x - n, self.y + 1)
                         break
                     if self.simulation.map[self.y + 1][self.x - n] in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS:
                         break
@@ -164,6 +191,8 @@ class AcidParticle:
                 self.simulation.particles[(self.x, self.y)] = None
                 self.simulation.particles[(self.x, self.y + 1)] = self
                 self.y += 1
+        if self.y + 1 < self.simulation.ROWS and (self.simulation.map[self.y + 1][self.x] == FIRE or (self.simulation.map[self.y + 1][self.x] == OIL and self.simulation.particles[(self.x, self.y + 1)].isOnFire)):  # water is on top of fire
+            self.put_out_fire(self.x, self.y + 1)
         self.update_liquid_neighbour_count()
         if self.liquid_neighbour_count > 0:
             avg_strength = self.avg_neighbour_strength
