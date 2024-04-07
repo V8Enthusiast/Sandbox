@@ -13,11 +13,13 @@ ACID = 4
 PLASTIC = 5
 FIRE = 6
 WOOD = 7
+OIL = 8
 
 class Simulation:
     def __init__(self, app):
         self.app = app
         self.gravity = 9.81
+        self.bg_color = (33, 33, 33)
         self.base_temp = 20
         self.heat_width = 90 # the higher this value is, the narrower the heat will be
         self.calculate_heat = False
@@ -27,6 +29,7 @@ class Simulation:
         self.LIQUIDS = [WATER, ACID]
         self.NON_ACIDIC_LIQUIDS = [WATER]
         self.NON_DISSOLVABLE_PARTICLES = [ACID, PLASTIC]
+        self.FLAMMABLE_PARTICLES = [PLASTIC, WOOD, OIL]
         self.window = self.app.screen
         self.buttons = []
         self.particle_size = 5 # the length of all particles (in pixels, 1 for perfect detail)
@@ -48,13 +51,13 @@ class Simulation:
         scale = self.heat_map[r][c] / 400
         if scale > 1:
             scale = 1
-        color = functions.mix_colors((255, 0, 0), (33, 33, 33), scale)
+        color = functions.mix_colors((255, 0, 0), self.bg_color, scale)
         rect = pygame.Rect(0, 0, self.particle_size, self.particle_size)
         rect.center = ((c) * self.particle_size, (r) * self.particle_size)
         pygame.draw.rect(self.window, color, rect)
 
     def render(self):
-        self.window.fill((33, 33, 33))
+        self.window.fill(self.bg_color)
         if self.add_material_on:
             self.add_material()
         continue_calculating_heat = False
@@ -193,5 +196,5 @@ class Simulation:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
                     self.map[y][x] = self.selected_material
-                    self.particles[(x, y)] = fire.FireParticle(self, x, y, (222, 64, 24))
+                    self.particles[(x, y)] = fire.FireParticle(self, x, y, self.bg_color)
                     self.calculate_heat = True
