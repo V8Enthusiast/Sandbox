@@ -12,9 +12,11 @@ class FireParticle:
         self.x = x
         self.y = y
         self.burning_material_color = burning_material_color
+        self.color = burning_material_color
         self.rendered = False
         self.isFalling = False
         self.part_size = self.simulation.particle_size // fire_detail
+        self.burning_material = None
         self.fuel_left = 15
         self.start_fuel = 15
         self.chance_to_leave_ash = 0
@@ -27,22 +29,27 @@ class FireParticle:
                     if random.randint(0, 100) > 50:
                         pygame.draw.rect(self.simulation.window, random.choice(colors), rect)
                     else:
-                        pygame.draw.rect(self.simulation.window, self.burning_material_color, rect)
+                        pygame.draw.rect(self.simulation.window, self.color, rect)
 
             self.calculate_physics()
             self.rendered = True
 
     def swap_particle_with_fire(self, x, y):
         if random.randint(0, 1000) < self.simulation.particles[(x, y)].flammability:
-            self.simulation.map[y][x] = 6
-            fuel = self.simulation.particles[(x, y)].fuel
-            color = self.simulation.particles[(x, y)].color
-            chance_to_leave_ash = self.simulation.particles[(x, y)].chance_to_leave_ash_particle
-            self.simulation.particles[(x, y)] = FireParticle(self.simulation, x, y, color)
-            self.simulation.particles[(x, y)].fuel_left = fuel
-            self.simulation.particles[(x, y)].start_fuel = fuel
-            if chance_to_leave_ash > 0:
-                self.simulation.particles[(x, y)].chance_to_leave_ash = chance_to_leave_ash
+            if self.simulation.map[y][x] != 8:  # oil
+                fuel = self.simulation.particles[(x, y)].fuel
+                color = self.simulation.particles[(x, y)].color
+                burning_material = self.simulation.map[y][x]
+                chance_to_leave_ash = self.simulation.particles[(x, y)].chance_to_leave_ash_particle
+                self.simulation.map[y][x] = 6
+                self.simulation.particles[(x, y)] = FireParticle(self.simulation, x, y, color)
+                self.simulation.particles[(x, y)].fuel_left = fuel
+                self.simulation.particles[(x, y)].start_fuel = fuel
+                self.simulation.particles[(x, y)].burning_material = burning_material
+                if chance_to_leave_ash > 0:
+                    self.simulation.particles[(x, y)].chance_to_leave_ash = chance_to_leave_ash
+            else:
+                self.simulation.particles[(x, y)].isOnFire = True
 
 
     def spread_fire(self):
@@ -76,7 +83,7 @@ class FireParticle:
             self.simulation.heat_map[self.y - 1][self.x] += 5
             self.fuel_left -= 1
             if self.burning_material_color != self.simulation.bg_color:
-                self.burning_material_color = functions.mix_colors(self.burning_material_color,(10, 10, 10), self.fuel_left / self.start_fuel)
+                self.color = functions.mix_colors(self.burning_material_color,(10, 10, 10), self.fuel_left / self.start_fuel)
         else:
             if self.chance_to_leave_ash > 0 and random.randint(0, 100) < self.chance_to_leave_ash:
                 self.simulation.map[self.y][self.x] = 9
