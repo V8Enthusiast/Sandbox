@@ -1,12 +1,14 @@
 import pygame
 import random
 
+colors = [(10, 10, 10), (0, 0, 0), (50, 50, 50)]
+
 class AshParticle:
-    def __init__(self, simulation, x, y, color):
+    def __init__(self, simulation, x, y):
         self.simulation = simulation # a reference to the parent class (needed to access f.e. screen, map and particle size)
         self.x = x
         self.y = y
-        self.color = color
+        self.color = random.choice(colors)
         self.rendered = False
         self.isFalling = True
 

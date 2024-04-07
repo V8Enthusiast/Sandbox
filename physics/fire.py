@@ -87,7 +87,7 @@ class FireParticle:
         else:
             if self.chance_to_leave_ash > 0 and random.randint(0, 100) < self.chance_to_leave_ash:
                 self.simulation.map[self.y][self.x] = 9
-                self.simulation.particles[(self.x, self.y)] = ash.AshParticle(self.simulation, self.x, self.y, (0, 0, 0))
+                self.simulation.particles[(self.x, self.y)] = ash.AshParticle(self.simulation, self.x, self.y)
             else:
                 self.simulation.map[self.y][self.x] = 0
                 self.simulation.particles[(self.x, self.y)] = None
