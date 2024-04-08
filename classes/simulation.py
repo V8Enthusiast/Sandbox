@@ -153,6 +153,10 @@ class Simulation:
                     self.selected_material = OIL
                 if event.key == pygame.K_8:
                     self.selected_material = IRON
+                if event.key == pygame.K_9:
+                    self.selected_material = GOLD
+                if event.key == pygame.K_0:
+                    self.selected_material = COPPER
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.add_material_on = True
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
@@ -229,3 +233,13 @@ class Simulation:
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
                     self.map[y][x] = self.selected_material
                     self.particles[(x, y)] = metal.MetalParticle(self, x, y, (188, 196, 204), 100, 20)
+        if self.selected_material == GOLD:
+            for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
+                for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
+                    self.map[y][x] = self.selected_material
+                    self.particles[(x, y)] = metal.MetalParticle(self, x, y, (212, 175, 55), 70, 20)
+        if self.selected_material == COPPER:
+            for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
+                for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
+                    self.map[y][x] = self.selected_material
+                    self.particles[(x, y)] = metal.MetalParticle(self, x, y, (184, 115, 51), 40, 20)
