@@ -8,10 +8,11 @@ class App:
         self.fps = 60
         self.width = width
         self.height = height
-        self.hotbar_height = 100
         self.is_FS_enabled = fullscreen
         self.is_vsync_enabled = vsync
         self.scale = 1
+
+        self.hotbar_height = 100 * self.scale
         self.ui = mainmenu.MainMenu(self)
         self.isUserMovingPiece = False
 

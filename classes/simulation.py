@@ -263,12 +263,12 @@ class Simulation:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
                     self.map[y][x] = self.selected_material
-                    self.particles[(x, y)] = metal.MetalParticle(self, x, y, (212, 175, 55), 70, 20)
+                    self.particles[(x, y)] = metal.MetalParticle(self, x, y, (212, 175, 55), 60, 20)
         if self.selected_material == COPPER:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
                     self.map[y][x] = self.selected_material
-                    self.particles[(x, y)] = metal.MetalParticle(self, x, y, (184, 115, 51), 40, 20)
+                    self.particles[(x, y)] = metal.MetalParticle(self, x, y, (184, 115, 51), 70, 20)
         if self.selected_material == 0:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
