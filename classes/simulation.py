@@ -58,7 +58,7 @@ class Simulation:
 
         self.side_margin = int(20 * self.app.scale)
 
-        self.button_names = ['sand', 'water', 'stone', 'acid', 'plastic', 'fire', 'oil', 'iron', 'gold', 'copper', 'eraser']
+        self.button_names = ['sand', 'water', 'stone', 'acid', 'plastic', 'fire', 'oil', 'iron', 'gold', 'copper', 'eraser', 'settings', 'exit']
         button_amount = len(self.button_names)
         #button_size = (self.app.width - 2 * self.side_margin) // button_amount
         button_size = int(64 * self.app.scale)

@@ -1,7 +1,9 @@
 import random
-from classes import simulation
+from classes import simulation, mainmenu
 
 import pygame
+
+transparent_icons = ['fire', 'eraser', 'settings', 'exit']
 
 class HotbarButton:
     def __init__(self, width, height, x, y, translucent, font, image, bgcolor, fgcolor, function, app, simulation):
@@ -15,10 +17,7 @@ class HotbarButton:
         self.fgcolor = fgcolor
         self.app = app
         self.simulation = simulation
-        if image != 'sand' and image != 'water':
-            self.image = pygame.image.load(f"img/sand.png").convert()
-        else:
-            self.image = pygame.image.load(f"img/{image}.png").convert()
+        self.image = pygame.image.load(f"img/{image}.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (self.width, self.height))
         self.border = 2
         self.function = function
@@ -28,11 +27,19 @@ class HotbarButton:
     def render(self):
         # Put together the button based on the parameters
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        if self.simulation.selected_button == self.function:
-            #self.bgcolor = (200, 200, 200)
-            self.bgcolor = self.simulation.hotbar_color
+        if self.function not in transparent_icons:
+            if self.simulation.selected_button == self.function:
+                #self.bgcolor = (200, 200, 200)
+                self.bgcolor = self.simulation.hotbar_color
+            else:
+                self.bgcolor = self.simulation.bg_color
+        elif self.function == 'fire' or self.function == 'eraser':
+            if self.simulation.selected_button == self.function:
+                self.bgcolor = self.simulation.bg_color
+            else:
+                self.bgcolor = self.simulation.hotbar_color
         else:
-            self.bgcolor = (0, 0, 0)
+            self.bgcolor = self.simulation.hotbar_color
 
         # Draw the button
         pygame.draw.rect(self.app.screen, self.bgcolor, self.rect)
@@ -45,7 +52,7 @@ class HotbarButton:
             self.simulation.selected_material = 2
         elif self.function == 'stone':
             self.simulation.selected_material = 3
-        elif self.function == 'acid':
+        elif self.function == 'acid': #
             self.simulation.selected_material = 4
         elif self.function == 'plastic':
             self.simulation.selected_material = 5
@@ -61,5 +68,7 @@ class HotbarButton:
             self.simulation.selected_material = 12
         elif self.function == 'eraser':
             self.simulation.selected_material = 0
+        elif self.function == 'exit':
+            self.app.ui = mainmenu.MainMenu(self.app)
         else:
             print("unassigned button")
