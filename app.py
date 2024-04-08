@@ -47,7 +47,7 @@ class App:
         pygame.display.update()
     def mainloop(self):
         self.clock.tick(self.fps)
-        print(self.clock.get_fps())
+        #print(self.clock.get_fps())
         if self.run is False:
             pygame.quit()
         self.background()

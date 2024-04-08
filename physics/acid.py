@@ -276,9 +276,6 @@ class AcidParticle:
                     # add strength to the acid at that square
                     self.add_acid_strength_to_particle(self.x + 1, self.y + 1, strength_increment, avg_strength)
 
-
-
-
         if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] not in self.simulation.NON_DISSOLVABLE_PARTICLES:
             if random.randint(0, 100) <= self.strength:
                 self.simulation.map[self.y][self.x] = 0  # reset the current square

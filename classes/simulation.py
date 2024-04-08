@@ -2,6 +2,7 @@ import random
 
 import pygame
 from physics import sand, water, stone, acid, plastic, fire, oil, metal
+from classes import hotbar_button
 import functions
 
 # references used for clearer code
@@ -53,6 +54,21 @@ class Simulation:
         self.selected_material = SAND
         self.add_material_on = False
         self.active_water_particles = 0
+        self.hotbar_color = (150, 150, 150)
+
+        self.side_margin = int(20 * self.app.scale)
+
+        self.button_names = ['sand', 'water', 'stone', 'acid', 'plastic', 'fire', 'oil', 'iron', 'gold', 'copper', 'eraser']
+        button_amount = len(self.button_names)
+        #button_size = (self.app.width - 2 * self.side_margin) // button_amount
+        button_size = int(64 * self.app.scale)
+        space_between_buttons = (self.app.width - self.side_margin * 2 - button_amount * button_size) // (button_amount - 1)
+        height = (self.app.hotbar_height - button_size) // 2
+        self.hotbar_buttons = []
+        for idx, button_name in enumerate(self.button_names):
+            self.hotbar_buttons.append(hotbar_button.HotbarButton(button_size, button_size, self.side_margin + idx * (button_size + space_between_buttons), self.app.height + height, False, "fonts/main_font.ttf", button_name, (0, 0, 0), (255, 255, 255), button_name, self.app, self))
+
+        self.selected_button = None
 
     def draw_heat(self, r, c):
         # heat visualization
@@ -128,7 +144,9 @@ class Simulation:
 
     def render_hotbar(self):
         hotbar_rect = pygame.Rect(0, self.app.height - 2, self.app.width, self.app.hotbar_height)
-        pygame.draw.rect(self.window, (150, 150, 150) ,hotbar_rect)
+        pygame.draw.rect(self.window, self.hotbar_color ,hotbar_rect)
+        for button in self.hotbar_buttons:
+            button.render()
 
     # Overrides the default events function in app.py
     def events(self):
@@ -158,7 +176,15 @@ class Simulation:
                 if event.key == pygame.K_0:
                     self.selected_material = COPPER
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                self.add_material_on = True
+                click_pos = pygame.mouse.get_pos()
+                button_clicked = False
+                for button in self.hotbar_buttons:
+                    if button.rect.collidepoint(click_pos[0], click_pos[1]):
+                        button.click()
+                        button_clicked = True
+                        self.selected_button = button.function
+                if button_clicked is False:
+                    self.add_material_on = True
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 self.add_material_on = False
 
@@ -243,3 +269,8 @@ class Simulation:
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
                     self.map[y][x] = self.selected_material
                     self.particles[(x, y)] = metal.MetalParticle(self, x, y, (184, 115, 51), 40, 20)
+        if self.selected_material == 0:
+            for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
+                for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
+                    self.map[y][x] = 0
+                    self.particles[(x, y)] = None
