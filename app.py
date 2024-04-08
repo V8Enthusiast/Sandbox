@@ -25,6 +25,7 @@ class App:
             self.screen = pygame.display.set_mode((width, height + self.hotbar_height), vsync=int(vsync))
 
         self.run = True # Variable to determine if the app is running
+        pygame.display.set_caption("Sandbox")
 
     def events(self):
         for event in pygame.event.get():
