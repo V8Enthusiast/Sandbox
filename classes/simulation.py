@@ -1,7 +1,7 @@
 import random
 
 import pygame
-from physics import sand, water, stone, acid, plastic, fire, oil
+from physics import sand, water, stone, acid, plastic, fire, oil, metal
 import functions
 
 # references used for clearer code
@@ -15,6 +15,9 @@ FIRE = 6
 WOOD = 7
 OIL = 8
 ASH = 9
+IRON = 10
+GOLD = 11
+COPPER = 12
 
 class Simulation:
     def __init__(self, app):
@@ -25,7 +28,8 @@ class Simulation:
         self.heat_width = 90 # the higher this value is, the narrower the heat will be
         self.calculate_heat = False
         self.view_heat = False
-        self.SOLIDS = [STONE, WOOD, PLASTIC]
+        self.SOLIDS = [STONE, WOOD, PLASTIC, IRON, GOLD, COPPER]
+        self.METALS = [IRON, GOLD, COPPER]
         self.MOVING_SOLIDS = [SAND, ASH]
         self.LIQUIDS = [WATER, ACID]
         self.NON_ACIDIC_LIQUIDS = [WATER]
@@ -147,6 +151,8 @@ class Simulation:
                     self.selected_material = FIRE
                 if event.key == pygame.K_7:
                     self.selected_material = OIL
+                if event.key == pygame.K_8:
+                    self.selected_material = IRON
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.add_material_on = True
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
@@ -218,3 +224,8 @@ class Simulation:
                             self.particles[(x, y)] = oil.OilParticle(self, x, y, (69, 45, 19))
                         except:
                             pass
+        if self.selected_material == IRON:
+            for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
+                for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
+                    self.map[y][x] = self.selected_material
+                    self.particles[(x, y)] = metal.MetalParticle(self, x, y, (188, 196, 204), 100, 20)

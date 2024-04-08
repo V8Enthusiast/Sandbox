@@ -30,7 +30,6 @@ class AcidParticle:
             pygame.draw.rect(self.simulation.window, self.color, rect)
             self.calculate_physics()
             self.rendered = True
-            self.simulation.active_water_particles += 1
 
     def put_out_fire(self, x, y):
         if self.simulation.map[y][x] == OIL:

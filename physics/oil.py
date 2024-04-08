@@ -42,7 +42,6 @@ class OilParticle:
                 pygame.draw.rect(self.simulation.window, self.color, rect)
             self.calculate_physics()
             self.rendered = True
-            self.simulation.active_water_particles += 1
 
     def swap_particle_with_fire(self, x, y):
         if random.randint(0, 1000) < self.simulation.particles[(x, y)].flammability:
