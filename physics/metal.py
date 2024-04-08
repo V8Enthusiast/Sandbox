@@ -39,6 +39,7 @@ class MetalParticle:
                 self.isLiquid = True
             else:
                 self.isLiquid = False
+                self.isFalling = False
             self.color = functions.mix_colors(fully_melted_color, self.base_color, min((max(self.temp - 20, 0))/self.melting_temp, 1))
             self.calculate_physics()
             self.rendered = True
