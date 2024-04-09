@@ -13,8 +13,6 @@ class App:
         self.scale = 1
 
         self.hotbar_height = 100 * self.scale
-        self.ui = mainmenu.MainMenu(self)
-        self.isUserMovingPiece = False
 
         # Initialize pygame
         pygame.init()
@@ -24,6 +22,8 @@ class App:
             self.screen = pygame.display.set_mode((width, height + self.hotbar_height), pygame.FULLSCREEN, vsync=int(vsync))
         else:
             self.screen = pygame.display.set_mode((width, height + self.hotbar_height), vsync=int(vsync))
+
+        self.ui = mainmenu.MainMenu(self)
 
         self.run = True # Variable to determine if the app is running
         pygame.display.set_caption("Sandbox")

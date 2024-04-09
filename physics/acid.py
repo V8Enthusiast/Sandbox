@@ -231,7 +231,7 @@ class AcidParticle:
                 self.simulation.particles[(self.x, self.y + 1)] = self
                 self.y += 1
             elif self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] not in self.simulation.NON_DISSOLVABLE_PARTICLES and isDissolving:
-                print(self.simulation.map[self.y + 1][self.x])
+                # print(self.simulation.map[self.y + 1][self.x])
                 self.simulation.map[self.y][self.x] = 0 # reset the current square
                 self.simulation.map[self.y + 1][self.x] = 4
                 self.simulation.particles[(self.x, self.y)] = None
