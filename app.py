@@ -1,6 +1,8 @@
+import random
+
 import pygame
 from classes import mainmenu
-
+icon_file_names = ['sand', 'water', 'stone', 'acid', 'plastic', 'fire', 'oil', 'iron', 'gold', 'copper', 'hydrogen', 'chlorine']
 class App:
     def __init__(self, width, height, fullscreen, vsync):
         # Save the data passed into the function to variables
@@ -29,6 +31,10 @@ class App:
 
         self.run = True # Variable to determine if the app is running
         pygame.display.set_caption("Sandbox")
+        icon_name = random.choice(icon_file_names)
+        icon_image = pygame.image.load(f"img/{icon_name}.png")
+        icon_surface = pygame.transform.scale(icon_image, (32, 32))
+        pygame.display.set_icon(icon_surface)
 
     def events(self):
         for event in pygame.event.get():
