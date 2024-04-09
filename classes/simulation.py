@@ -194,8 +194,8 @@ class Simulation:
         clicked_column = int(mouse_x) // self.particle_size
         if clicked_column >= self.COLUMNS or clicked_row >= self.ROWS:
             return
-        if self.map[clicked_row][clicked_column] == self.selected_material:
-            return
+        # if self.map[clicked_row][clicked_column] == self.selected_material:
+        #     return
         if self.selected_material == SAND:
             #self.particles[(clicked_column, clicked_row)] = sand.SandParticle(self, clicked_column, clicked_row, (230, 200, 0), 0)
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
@@ -274,3 +274,5 @@ class Simulation:
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
                     self.map[y][x] = 0
                     self.particles[(x, y)] = None
+                    self.smoke_map[y][x] = 0
+                    self.smoke_particles[(x, y)] = None
