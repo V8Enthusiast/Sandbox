@@ -123,6 +123,8 @@ class SmokeParticle:
                 else:
                     self.simulation.map[self.y][self.x] = 0
                     self.simulation.particles[(self.x, self.y)] = None
+                    self.simulation.smoke_particles[(self.x, self.y)] = SmokeParticle(self.simulation, self.x, self.y, 'CO2')
+                    self.simulation.smoke_map[self.y][self.x] = 1
 
         if self.y - 1 >= 0 and self.map[self.y - 1][self.x] != 0 and self.particles[(self.x, self.y - 1)].isFalling is False:
             self.isFalling = False

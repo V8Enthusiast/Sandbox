@@ -1,7 +1,7 @@
 import pygame
 import random
 import functions
-from physics import ash
+from physics import ash, smoke
 
 fire_detail = 1
 colors = [(222, 64, 24), (222, 126, 24)]
@@ -91,4 +91,6 @@ class FireParticle:
             else:
                 self.simulation.map[self.y][self.x] = 0
                 self.simulation.particles[(self.x, self.y)] = None
+                self.simulation.smoke_particles[(self.x, self.y)] = smoke.SmokeParticle(self.simulation, self.x, self.y,'CO2')
+                self.simulation.smoke_map[self.y][self.x] = 1
 

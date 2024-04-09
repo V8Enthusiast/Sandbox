@@ -37,6 +37,7 @@ class AcidParticle:
                 diff = abs(self.simulation.heat_map[self.y][self.x] - self.temp)
                 if self.simulation.heat_map[self.y][self.x] > self.temp:
                     self.temp += diff / 2
+                    self.temp += diff / 2
                 elif self.simulation.heat_map[self.y][self.x] < self.temp:
                     self.temp -= diff / 2
             if self.temp >= self.melting_temp:
