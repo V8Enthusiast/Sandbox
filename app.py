@@ -23,6 +23,8 @@ class App:
         else:
             self.screen = pygame.display.set_mode((width, height + self.hotbar_height), vsync=int(vsync))
 
+        self.active_simulation = None
+
         self.ui = mainmenu.MainMenu(self)
 
         self.run = True # Variable to determine if the app is running

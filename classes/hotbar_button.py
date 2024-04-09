@@ -1,5 +1,5 @@
 import random
-from classes import simulation, mainmenu
+from classes import simulation, mainmenu, settingscreen
 
 import pygame
 
@@ -72,6 +72,9 @@ class HotbarButton:
             self.simulation.selected_material = 14
         elif self.function == 'eraser':
             self.simulation.selected_material = 0
+        elif self.function == 'settings':
+            self.app.ui = settingscreen.Settings(self.app)
+            self.app.active_simulation = self.simulation
         elif self.function == 'exit':
             self.app.ui = mainmenu.MainMenu(self.app)
         else:

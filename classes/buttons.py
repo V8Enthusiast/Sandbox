@@ -32,6 +32,9 @@ class Button:
         self.app.screen.blit(self.display_text, self.display_text_rect)
     def click(self):
         if self.function == 'play':
-            self.app.ui = simulation.Simulation(self.app) # Change the displayed ui to the simulation
+            self.app.ui = simulation.Simulation(self.app) # Change the displayed ui to a new simulation
+        if self.function == 'back':
+            self.app.ui = self.app.active_simulation # Change the displayed ui back to the simulation
+            self.app.active_simulation = None
         else:
             self.bgcolor = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
