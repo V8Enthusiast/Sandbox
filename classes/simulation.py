@@ -1,7 +1,7 @@
 import random
 
 import pygame
-from physics import sand, water, stone, acid, plastic, fire, oil, metal
+from physics import sand, water, stone, acid, plastic, fire, oil, metal, smoke
 from classes import hotbar_button
 import functions
 
@@ -36,7 +36,7 @@ class Simulation:
         self.LIQUIDS = [WATER, ACID]
         self.NON_ACIDIC_LIQUIDS = [WATER]
         self.NON_DISSOLVABLE_PARTICLES = [ACID, PLASTIC]
-        self.FLAMMABLE_PARTICLES = [PLASTIC, WOOD, OIL]
+        self.FLAMMABLE_PARTICLES = [PLASTIC, WOOD, OIL, HYDROGEN]
         self.window = self.app.screen
         self.buttons = []
         self.particle_size = 5 # the length of all particles (in pixels, 1 for perfect detail)
@@ -273,7 +273,9 @@ class Simulation:
         if self.selected_material == 0:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
-                    self.map[y][x] = 0
-                    self.particles[(x, y)] = None
-                    self.smoke_map[y][x] = 0
-                    self.smoke_particles[(x, y)] = None
+                    # self.map[y][x] = 0
+                    # self.particles[(x, y)] = None
+                    # self.smoke_map[y][x] = 0
+                    # self.smoke_particles[(x, y)] = None
+                    self.particles[(x, y)] = smoke.SmokeParticle(self, x, y, 'H2')
+                    self.map[y][x] = HYDROGEN

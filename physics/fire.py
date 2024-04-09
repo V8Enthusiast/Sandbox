@@ -36,7 +36,7 @@ class FireParticle:
 
     def swap_particle_with_fire(self, x, y):
         if random.randint(0, 1000) < self.simulation.particles[(x, y)].flammability:
-            if self.simulation.map[y][x] != 8:  # oil
+            if self.simulation.map[y][x] != 8 and self.simulation.map[y][x] != 13:  # oil # hydrogen
                 fuel = self.simulation.particles[(x, y)].fuel
                 color = self.simulation.particles[(x, y)].color
                 burning_material = self.simulation.map[y][x]
