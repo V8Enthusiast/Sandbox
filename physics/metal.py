@@ -5,7 +5,7 @@ import functions
 from physics import plastic, oil, smoke
 
 FIRE = 6
-OIL = 8
+MOVING_FIRE_MATERALS = [8, 13] # oil and hydrogen
 
 fully_melted_color = (252, 22, 18)
 
@@ -45,7 +45,7 @@ class MetalParticle:
             self.rendered = True
 
     def put_out_fire(self, x, y):
-        if self.simulation.map[y][x] == OIL:
+        if self.simulation.map[y][x] in MOVING_FIRE_MATERALS:
             self.simulation.particles[(x, y)].isOnFire = False
             self.simulation.map[self.y][self.x] = 0  # reset the current square
             self.simulation.particles[(self.x, self.y)] = None
@@ -94,7 +94,7 @@ class MetalParticle:
                         if self.simulation.map[self.y + 1][self.x + i] == 0:
                             first_empty_particle_right_x = self.x + i
                             break
-                        elif self.simulation.map[self.y + 1][self.x + i] == FIRE or (self.simulation.map[self.y + 1][self.x + i] == OIL and self.simulation.particles[(self.x + i, self.y + 1)].isOnFire):
+                        elif self.simulation.map[self.y + 1][self.x + i] == FIRE or (self.simulation.map[self.y + 1][self.x + i] in MOVING_FIRE_MATERALS and self.simulation.particles[(self.x + i, self.y + 1)].isOnFire):
                             self.put_out_fire(self.x + i, self.y + 1)
                             break
                         if self.simulation.map[self.y + 1][self.x + i] in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS:
@@ -106,7 +106,7 @@ class MetalParticle:
                         if self.simulation.map[self.y + 1][self.x - n] == 0:
                             first_empty_particle_left_x = self.x - n
                             break
-                        elif self.simulation.map[self.y + 1][self.x - n] == FIRE or (self.simulation.map[self.y + 1][self.x - n] == OIL and self.simulation.particles[(self.x - n, self.y + 1)].isOnFire):
+                        elif self.simulation.map[self.y + 1][self.x - n] == FIRE or (self.simulation.map[self.y + 1][self.x - n] in MOVING_FIRE_MATERALS and self.simulation.particles[(self.x - n, self.y + 1)].isOnFire):
                             self.put_out_fire(self.x - n, self.y + 1)
                             break
                         if self.simulation.map[self.y + 1][self.x - n] in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS:
@@ -146,5 +146,5 @@ class MetalParticle:
                     self.simulation.particles[(self.x, self.y)] = None
                     self.simulation.particles[(self.x, self.y + 1)] = self
                     self.y += 1
-            if self.y + 1 < self.simulation.ROWS and (self.simulation.map[self.y + 1][self.x] == FIRE or (self.simulation.map[self.y + 1][self.x] == OIL and self.simulation.particles[(self.x, self.y + 1)].isOnFire)):  # water is on top of fire
+            if self.y + 1 < self.simulation.ROWS and (self.simulation.map[self.y + 1][self.x] == FIRE or (self.simulation.map[self.y + 1][self.x] in MOVING_FIRE_MATERALS and self.simulation.particles[(self.x, self.y + 1)].isOnFire)):  # water is on top of fire
                 self.put_out_fire(self.x, self.y + 1)
