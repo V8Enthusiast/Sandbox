@@ -22,8 +22,6 @@ COPPER = 12
 HYDROGEN = 13
 CHLORINE = 14
 
-
-
 class MainMenu:
     def __init__(self, app):
         self.app = app
@@ -55,6 +53,16 @@ class MainMenu:
         self.particle_size = 5 # the length of all particles (in pixels, 1 for perfect detail)
         self.COLUMNS = self.app.width // self.particle_size
         self.ROWS = (self.app.height + self.app.hotbar_height) // self.particle_size
+
+        self.max_particles = 650 # self.COLUMNS * self.ROWS // 13
+        self.max_metal_particles = (self.max_particles // 12) * 2
+        self.max_liquid_particles = (self.max_particles // 12) * 4
+
+        self.active_particles = 0
+        self.active_metal_particles = 0
+        self.active_liquid_particles = 0
+
+
         self.map = [[AIR for _ in range(self.COLUMNS)] for i in range(self.ROWS)]
         self.heat_map = [[20 for _ in range(self.COLUMNS)] for i in range(self.ROWS)]
         self.smoke_map = [[0 for _ in range(self.COLUMNS)] for i in range(self.ROWS)]
@@ -164,6 +172,22 @@ class MainMenu:
         display_text_rect.center = self.main_text_rect_center
         self.app.screen.blit(display_text, display_text_rect)
 
+        if self.active_particles >= self.max_particles:
+            self.active_particles = 0
+            self.active_metal_particles = 0
+            self.active_liquid_particles = 0
+
+            self.map = [[AIR for _ in range(self.COLUMNS)] for i in range(self.ROWS)]
+            self.heat_map = [[20 for _ in range(self.COLUMNS)] for i in range(self.ROWS)]
+            self.smoke_map = [[0 for _ in range(self.COLUMNS)] for i in range(self.ROWS)]
+            self.particles = {}
+            self.smoke_particles = {}
+            self.place_radius = 1
+            for y in range(self.ROWS):
+                for x in range(self.COLUMNS):
+                    self.particles[(x, y)] = None
+                    self.smoke_particles[(x, y)] = None
+
         random_row = random.randint(0, self.ROWS - 1)
 
         random_column = None
@@ -174,7 +198,20 @@ class MainMenu:
                 random_column = None
             iterations += 1
         if random_column is not None:
-            self.selected_material = random.choice(self.materials)
+            has_selected_material = False
+            while has_selected_material is False:
+                self.selected_material = random.choice(self.materials)
+                if self.selected_material in self.METALS:
+                    if self.active_metal_particles <= self.max_metal_particles:
+                        self.active_metal_particles += 1
+                        has_selected_material = True
+                elif self.selected_material in self.LIQUIDS:
+                    if self.active_liquid_particles <= self.max_liquid_particles:
+                        self.active_liquid_particles += 1
+                        has_selected_material = True
+                else:
+                    has_selected_material = True
+            self.active_particles += 1
             self.add_material(random_column, random_row)
 
 

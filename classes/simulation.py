@@ -121,7 +121,10 @@ class Simulation:
                         #print(f'After: {self.heat_map[r][c]}')
 
                 if self.particles[(c, r)] is not None:
-                    self.particles[(c, r)].render()
+                    try:
+                        self.particles[(c, r)].render()
+                    except:
+                        print("Error rendering")
                 elif self.view_heat:
                     if self.heat_map[r][c] != self.base_temp:
                         self.draw_heat(r, c)
