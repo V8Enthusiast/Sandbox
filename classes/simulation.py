@@ -19,6 +19,7 @@ ASH = 9
 IRON = 10
 GOLD = 11
 COPPER = 12
+HYDROGEN = 13
 
 class Simulation:
     def __init__(self, app):

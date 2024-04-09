@@ -50,12 +50,12 @@ class MetalParticle:
             self.simulation.map[self.y][self.x] = 0  # reset the current square
             self.simulation.particles[(self.x, self.y)] = None
             self.simulation.smoke_map[y][x] = 1
-            self.simulation.smoke_particles[(x, y)] = smoke.SmokeParticle(self.simulation, x, y)
+            self.simulation.smoke_particles[(x, y)] = smoke.SmokeParticle(self.simulation, x, y, 'H2')
         elif self.simulation.particles[(x, y)].burning_material is not None:
             self.simulation.map[self.y][self.x] = 0  # reset the current square
             self.simulation.map[y][x] = self.simulation.particles[(x, y)].burning_material
             self.simulation.smoke_map[y][x] = 1
-            self.simulation.smoke_particles[(x, y)] = smoke.SmokeParticle(self.simulation, x, y)
+            self.simulation.smoke_particles[(x, y)] = smoke.SmokeParticle(self.simulation, x, y, 'H2')
             self.simulation.particles[(self.x, self.y)] = None
             if self.simulation.particles[(x, y)].burning_material == 5: # Plastic
                 self.simulation.particles[(x, y)] = plastic.PlasticParticle(self.simulation, x, y, self.simulation.particles[(x, y)].burning_material_color)
@@ -63,7 +63,7 @@ class MetalParticle:
             self.simulation.map[self.y][self.x] = 0  # reset the current square
             self.simulation.map[y][x] = 0
             self.simulation.smoke_map[y][x] = 1
-            self.simulation.smoke_particles[(x, y)] = smoke.SmokeParticle(self.simulation, x, y)
+            self.simulation.smoke_particles[(x, y)] = smoke.SmokeParticle(self.simulation, x, y, 'H2')
             self.simulation.particles[(self.x, self.y)] = None
             self.simulation.particles[(x, y)] = None
 
