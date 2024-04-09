@@ -25,6 +25,7 @@ CHLORINE = 14
 class Simulation:
     def __init__(self, app):
         self.app = app
+        self.debug = False
         self.gravity = 9.81
         self.bg_color = (33, 33, 33)
         self.base_temp = 20
@@ -124,7 +125,8 @@ class Simulation:
                     try:
                         self.particles[(c, r)].render()
                     except:
-                        print("Error rendering")
+                        if self.debug:
+                            print("Error rendering")
                 elif self.view_heat:
                     if self.heat_map[r][c] != self.base_temp:
                         self.draw_heat(r, c)

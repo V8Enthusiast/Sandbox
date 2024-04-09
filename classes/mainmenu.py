@@ -25,6 +25,7 @@ CHLORINE = 14
 class MainMenu:
     def __init__(self, app):
         self.app = app
+        self.debug = False
 
         self.main_text_rect_center = (self.app.width // 2, 250 * self.app.scale)
         self.font = "fonts/main_font.ttf"
@@ -144,7 +145,8 @@ class MainMenu:
                     try:
                         self.particles[(c, r)].render()
                     except:
-                        print("Error rendering")
+                        if self.debug:
+                            print("Error rendering")
                 elif self.view_heat:
                     if self.heat_map[r][c] != self.base_temp:
                         self.draw_heat(r, c)

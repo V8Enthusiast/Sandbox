@@ -46,8 +46,8 @@ class App:
                 for button in self.ui.buttons:
                     if button.rect.collidepoint(click_pos[0], click_pos[1]):
                         button.click()
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                print(pygame.mouse.get_pos())
+            # if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            #     print(pygame.mouse.get_pos())
 
 
     def background(self):
