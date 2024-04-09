@@ -38,6 +38,15 @@ class SmokeParticle:
             self.particles = self.simulation.smoke_particles
     def render(self):
         if self.rendered is False:
+            if self.type == 'H2' and self.map == self.simulation.smoke_map:
+                if self.simulation.map[self.y][self.x] == 0:
+                    self.simulation.map[self.y][self.x] = self.id
+                    self.simulation.particles[(self.x, self.y)] = self
+                    self.simulation.smoke_map[self.y][self.x] = 0
+                    self.simulation.smoke_particles[(self.x, self.y)] = None
+                    self.map = self.simulation.map
+                    self.particles = self.simulation.particles
+
             if self.isOnFire:
                 for r in range(fire_detail):
                     for c in range(fire_detail):

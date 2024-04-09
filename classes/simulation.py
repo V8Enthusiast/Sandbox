@@ -1,7 +1,7 @@
 import random
 
 import pygame
-from physics import sand, water, stone, acid, plastic, fire, oil, metal, smoke
+from physics import sand, water, stone, acid, plastic, fire, oil, metal, smoke, chlorine
 from classes import hotbar_button
 import functions
 
@@ -20,6 +20,7 @@ IRON = 10
 GOLD = 11
 COPPER = 12
 HYDROGEN = 13
+CHLORINE = 14
 
 class Simulation:
     def __init__(self, app):
@@ -32,10 +33,10 @@ class Simulation:
         self.view_heat = False
         self.SOLIDS = [STONE, WOOD, PLASTIC, IRON, GOLD, COPPER]
         self.METALS = [IRON, GOLD, COPPER]
-        self.MOVING_SOLIDS = [SAND, ASH]
+        self.MOVING_SOLIDS = [SAND, ASH, CHLORINE]
         self.LIQUIDS = [WATER, ACID]
         self.NON_ACIDIC_LIQUIDS = [WATER]
-        self.NON_DISSOLVABLE_PARTICLES = [ACID, PLASTIC]
+        self.NON_DISSOLVABLE_PARTICLES = [ACID, PLASTIC, CHLORINE]
         self.FLAMMABLE_PARTICLES = [PLASTIC, WOOD, OIL, HYDROGEN]
         self.window = self.app.screen
         self.buttons = []
@@ -277,5 +278,5 @@ class Simulation:
                     # self.particles[(x, y)] = None
                     # self.smoke_map[y][x] = 0
                     # self.smoke_particles[(x, y)] = None
-                    self.particles[(x, y)] = smoke.SmokeParticle(self, x, y, 'H2')
-                    self.map[y][x] = HYDROGEN
+                    self.particles[(x, y)] = chlorine.ChlorineParticle(self, x, y, (255, 255, 255), 25)
+                    self.map[y][x] = CHLORINE

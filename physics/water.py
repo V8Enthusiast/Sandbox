@@ -1,9 +1,11 @@
 import pygame
 import random
-from physics import plastic, oil, smoke
+from physics import plastic, oil, smoke, chlorine, acid
 
 FIRE = 6
 MOVING_FIRE_MATERALS = [8, 13] # oil and hydrogen
+CHLORINE = 14
+ACID = 4
 
 class WaterParticle:
     def __init__(self, simulation, x, y, color):
@@ -22,6 +24,7 @@ class WaterParticle:
             rect = pygame.Rect(0, 0, self.simulation.particle_size, self.simulation.particle_size)
             rect.center = (self.x * self.simulation.particle_size, self.y * self.simulation.particle_size)
             pygame.draw.rect(self.simulation.window, self.color, rect)
+
             if self.simulation.heat_map[self.y][self.x] != self.temp:
                 diff = abs(self.simulation.heat_map[self.y][self.x] - self.temp)
                 if self.simulation.heat_map[self.y][self.x] > self.temp:
@@ -61,6 +64,13 @@ class WaterParticle:
             self.simulation.particles[(self.x, self.y)] = None
             self.simulation.particles[(x, y)] = None
 
+    def create_acid(self, x, y):
+        strength = self.simulation.particles[(x, y)].strength
+        self.simulation.map[self.y][self.x] = 0  # reset the current square
+        self.simulation.particles[(self.x, self.y)] = None
+        self.simulation.map[y][x] = ACID
+        self.simulation.particles[(x, y)] = acid.AcidParticle(self.simulation, x, y, (102, 242, 15))
+        self.simulation.particles[(x, y)].strength = strength
 
     def calculate_physics(self):
         # checks if at least one particle under is air
@@ -90,6 +100,8 @@ class WaterParticle:
                     elif self.simulation.map[self.y + 1][self.x + i] == FIRE or (self.simulation.map[self.y + 1][self.x + i] in MOVING_FIRE_MATERALS and self.simulation.particles[(self.x + i, self.y + 1)].isOnFire):
                         self.put_out_fire(self.x + i, self.y + 1)
                         break
+                    elif self.simulation.map[self.y + 1][self.x + i] == CHLORINE:
+                        self.create_acid(self.x + i, self.y + 1)
                     if self.simulation.map[self.y + 1][self.x + i] in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS:
                         break
 
@@ -102,6 +114,8 @@ class WaterParticle:
                     elif self.simulation.map[self.y + 1][self.x - n] == FIRE or (self.simulation.map[self.y + 1][self.x - n] in MOVING_FIRE_MATERALS and self.simulation.particles[(self.x - n, self.y + 1)].isOnFire):
                         self.put_out_fire(self.x - n, self.y + 1)
                         break
+                    elif self.simulation.map[self.y + 1][self.x - n] == CHLORINE:
+                        self.create_acid(self.x - n, self.y + 1)
                     if self.simulation.map[self.y + 1][self.x - n] in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS:
                         break
 
@@ -141,3 +155,5 @@ class WaterParticle:
                 self.y += 1
         if self.y + 1 < self.simulation.ROWS and (self.simulation.map[self.y + 1][self.x] == FIRE or (self.simulation.map[self.y + 1][self.x] in MOVING_FIRE_MATERALS and self.simulation.particles[(self.x, self.y + 1)].isOnFire)):  # water is on top of fire
             self.put_out_fire(self.x, self.y + 1)
+        if self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] == CHLORINE:
+            self.create_acid(self.x, self.y + 1)

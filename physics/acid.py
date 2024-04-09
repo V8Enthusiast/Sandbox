@@ -1,13 +1,14 @@
 import pygame
 import random
 import functions
-from physics import plastic, smoke
+from physics import plastic, smoke, chlorine
 
 acid_strength = 25
 max_acid_strength = 50
 ACID = 4
 MOVING_FIRE_MATERALS = [8, 13] # oil and hydrogen
 FIRE = 6
+CHLORINE = 14
 
 class AcidParticle:
     def __init__(self, simulation, x, y, color):
@@ -21,6 +22,9 @@ class AcidParticle:
         self.liquid_neighbour_count = 0 # amount of liquid particles neighbouring with the particle which have less strength than the current particle
         self.avg_neighbour_strength = 0
 
+        self.temp = self.simulation.base_temp
+        self.melting_temp = 50
+
     def render(self):
         if self.rendered is False:
             #self.color = (int(176 * self.strength / max_acid_strength), int(191 * self.strength / max_acid_strength), int(26 * self.strength / max_acid_strength))
@@ -28,8 +32,41 @@ class AcidParticle:
             rect = pygame.Rect(0, 0, self.simulation.particle_size, self.simulation.particle_size)
             rect.center = (self.x * self.simulation.particle_size, self.y * self.simulation.particle_size)
             pygame.draw.rect(self.simulation.window, self.color, rect)
+
+            if self.simulation.heat_map[self.y][self.x] != self.temp:
+                diff = abs(self.simulation.heat_map[self.y][self.x] - self.temp)
+                if self.simulation.heat_map[self.y][self.x] > self.temp:
+                    self.temp += diff / 2
+                elif self.simulation.heat_map[self.y][self.x] < self.temp:
+                    self.temp -= diff / 2
+            if self.temp >= self.melting_temp:
+                # turn acid into Cl and H2 particles
+                self.simulation.smoke_particles[(self.x, self.y)] = smoke.SmokeParticle(self.simulation, self.x, self.y, 'H2')
+                self.simulation.smoke_map[self.y][self.x] = 1
+                self.simulation.smoke_particles[(self.x, self.y)].map = self.simulation.smoke_map
+                self.simulation.smoke_particles[(self.x, self.y)].particles = self.simulation.smoke_particles
+
+                self.simulation.particles[(self.x, self.y)] = chlorine.ChlorineParticle(self.simulation, self.x, self.y, (255, 255, 255), self.strength)
+                self.simulation.map[self.y][self.x] = CHLORINE
+
             self.calculate_physics()
             self.rendered = True
+
+    def update_acid(self, x, y):
+        cl_strength = self.simulation.particles[(x, y)].strength
+        new_strength = self.strength + cl_strength
+        if new_strength > max_acid_strength:
+            max_addition = max_acid_strength - self.strength
+            self.strength += max_addition
+            self.simulation.particles[(x, y)].strength -= max_addition
+        else:
+            self.strength += cl_strength
+            self.simulation.particles[(x, y)].strength -= cl_strength
+        # self.simulation.map[self.y][self.x] = 0  # reset the current square
+        # self.simulation.particles[(self.x, self.y)] = None
+        # self.simulation.map[y][x] = ACID
+        # self.simulation.particles[(x, y)] = AcidParticle(self.simulation, x, y, (102, 242, 15))
+        # self.simulation.particles[(x, y)].strength = strength
 
     def put_out_fire(self, x, y):
         if self.simulation.map[y][x] in MOVING_FIRE_MATERALS:
@@ -140,6 +177,8 @@ class AcidParticle:
                     elif self.simulation.map[self.y + 1][self.x + i] == FIRE or (self.simulation.map[self.y + 1][self.x + i] in MOVING_FIRE_MATERALS and self.simulation.particles[(self.x + i, self.y + 1)].isOnFire):
                         self.put_out_fire(self.x + i, self.y + 1)
                         break
+                    elif self.simulation.map[self.y + 1][self.x + i] == CHLORINE:
+                        self.update_acid(self.x + i, self.y + 1)
                     if self.simulation.map[self.y + 1][self.x + i] in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS:
                         break
 
@@ -152,6 +191,8 @@ class AcidParticle:
                     elif self.simulation.map[self.y + 1][self.x - n] == FIRE or (self.simulation.map[self.y + 1][self.x - n] in MOVING_FIRE_MATERALS and self.simulation.particles[(self.x - n, self.y + 1)].isOnFire):
                         self.put_out_fire(self.x - n, self.y + 1)
                         break
+                    elif self.simulation.map[self.y + 1][self.x - n] == CHLORINE:
+                        self.update_acid(self.x - n, self.y + 1)
                     if self.simulation.map[self.y + 1][self.x - n] in self.simulation.SOLIDS + self.simulation.MOVING_SOLIDS:
                         break
 
@@ -198,6 +239,8 @@ class AcidParticle:
                 self.y += 1
         if self.y + 1 < self.simulation.ROWS and (self.simulation.map[self.y + 1][self.x] == FIRE or (self.simulation.map[self.y + 1][self.x] in MOVING_FIRE_MATERALS and self.simulation.particles[(self.x, self.y + 1)].isOnFire)):  # water is on top of fire
             self.put_out_fire(self.x, self.y + 1)
+        elif self.y + 1 < self.simulation.ROWS and self.simulation.map[self.y + 1][self.x] == CHLORINE:
+            self.update_acid(self.x, self.y + 1)
         self.update_liquid_neighbour_count()
         if self.liquid_neighbour_count > 0:
             avg_strength = self.avg_neighbour_strength
