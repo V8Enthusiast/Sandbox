@@ -66,6 +66,10 @@ class HotbarButton:
             self.simulation.selected_material = 11
         elif self.function == 'copper':
             self.simulation.selected_material = 12
+        elif self.function == 'hydrogen':
+            self.simulation.selected_material = 13
+        elif self.function == 'chlorine':
+            self.simulation.selected_material = 14
         elif self.function == 'eraser':
             self.simulation.selected_material = 0
         elif self.function == 'exit':

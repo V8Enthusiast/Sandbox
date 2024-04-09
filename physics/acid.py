@@ -23,7 +23,7 @@ class AcidParticle:
         self.avg_neighbour_strength = 0
 
         self.temp = self.simulation.base_temp
-        self.melting_temp = 50
+        self.melting_temp = 153
 
     def render(self):
         if self.rendered is False:

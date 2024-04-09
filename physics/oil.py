@@ -86,7 +86,7 @@ class OilParticle:
         if self.isOnFire:
             self.spread_fire()
             if self.fuel_left > 0:
-                self.simulation.heat_map[self.y - 1][self.x] += 5
+                self.simulation.heat_map[self.y - 1][self.x] += 10
                 self.fuel_left -= 1
                 self.color = functions.mix_colors(self.start_color, (10, 10, 10),
                                                                    self.fuel_left / self.start_fuel)

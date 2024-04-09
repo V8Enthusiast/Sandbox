@@ -60,7 +60,7 @@ class Simulation:
 
         self.side_margin = int(20 * self.app.scale)
 
-        self.button_names = ['sand', 'water', 'stone', 'acid', 'plastic', 'fire', 'oil', 'iron', 'gold', 'copper', 'eraser', 'settings', 'exit']
+        self.button_names = ['sand', 'water', 'stone', 'acid', 'plastic', 'fire', 'oil', 'iron', 'gold', 'copper', 'hydrogen', 'chlorine', 'eraser', 'settings', 'exit']
         button_amount = len(self.button_names)
         #button_size = (self.app.width - 2 * self.side_margin) // button_amount
         button_size = int(64 * self.app.scale)
@@ -222,8 +222,11 @@ class Simulation:
         if self.selected_material == STONE:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
-                    self.map[y][x] = self.selected_material
-                    self.particles[(x, y)] = stone.StoneParticle(self, x, y, (136, 140, 141))
+                    try:
+                        self.map[y][x] = self.selected_material
+                        self.particles[(x, y)] = stone.StoneParticle(self, x, y, (136, 140, 141))
+                    except:
+                        pass
 
         if self.selected_material == ACID:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
@@ -238,15 +241,21 @@ class Simulation:
         if self.selected_material == PLASTIC:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
-                    self.map[y][x] = self.selected_material
-                    self.particles[(x, y)] = plastic.PlasticParticle(self, x, y, (215, 215, 215))
+                    try:
+                        self.map[y][x] = self.selected_material
+                        self.particles[(x, y)] = plastic.PlasticParticle(self, x, y, (215, 215, 215))
+                    except:
+                        pass
 
         if self.selected_material == FIRE:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
-                    self.map[y][x] = self.selected_material
-                    self.particles[(x, y)] = fire.FireParticle(self, x, y, self.bg_color)
-                    self.calculate_heat = True
+                    try:
+                        self.map[y][x] = self.selected_material
+                        self.particles[(x, y)] = fire.FireParticle(self, x, y, self.bg_color)
+                        self.calculate_heat = True
+                    except:
+                        pass
         if self.selected_material == OIL:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
@@ -259,24 +268,54 @@ class Simulation:
         if self.selected_material == IRON:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
-                    self.map[y][x] = self.selected_material
-                    self.particles[(x, y)] = metal.MetalParticle(self, x, y, (188, 196, 204), 150, 20)
+                    try:
+                        self.map[y][x] = self.selected_material
+                        self.particles[(x, y)] = metal.MetalParticle(self, x, y, (188, 196, 204), 150, 20)
+                    except:
+                        pass
         if self.selected_material == GOLD:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
-                    self.map[y][x] = self.selected_material
-                    self.particles[(x, y)] = metal.MetalParticle(self, x, y, (212, 175, 55), 90, 20)
+                    try:
+                        self.map[y][x] = self.selected_material
+                        self.particles[(x, y)] = metal.MetalParticle(self, x, y, (212, 175, 55), 90, 20)
+                    except:
+                        pass
         if self.selected_material == COPPER:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
-                    self.map[y][x] = self.selected_material
-                    self.particles[(x, y)] = metal.MetalParticle(self, x, y, (184, 115, 51), 100, 20)
+                    try:
+                        self.map[y][x] = self.selected_material
+                        self.particles[(x, y)] = metal.MetalParticle(self, x, y, (184, 115, 51), 100, 20)
+                    except:
+                        pass
+        if self.selected_material == HYDROGEN:
+            #self.particles[(clicked_column, clicked_row)] = sand.SandParticle(self, clicked_column, clicked_row, (230, 200, 0), 0)
+            for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
+                for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
+                    if random.randint(0, 100) > 65:
+                        try:
+                            self.map[y][x] = self.selected_material
+                            self.particles[(x, y)] = smoke.SmokeParticle(self, x, y, 'H2')
+                        except:
+                            pass
+        if self.selected_material == CHLORINE:
+            #self.particles[(clicked_column, clicked_row)] = sand.SandParticle(self, clicked_column, clicked_row, (230, 200, 0), 0)
+            for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
+                for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
+                    if random.randint(0, 100) > 65:
+                        try:
+                            self.map[y][x] = self.selected_material
+                            self.particles[(x, y)] = chlorine.ChlorineParticle(self, x, y, (255, 255, 255), 25)
+                        except:
+                            pass
         if self.selected_material == 0:
             for y in range(clicked_row - self.place_radius, clicked_row + self.place_radius + 1):
                 for x in range(clicked_column - self.place_radius, clicked_column + self.place_radius + 1):
-                    # self.map[y][x] = 0
-                    # self.particles[(x, y)] = None
-                    # self.smoke_map[y][x] = 0
-                    # self.smoke_particles[(x, y)] = None
-                    self.particles[(x, y)] = chlorine.ChlorineParticle(self, x, y, (255, 255, 255), 25)
-                    self.map[y][x] = CHLORINE
+                    try:
+                        self.map[y][x] = 0
+                        self.particles[(x, y)] = None
+                        self.smoke_map[y][x] = 0
+                        self.smoke_particles[(x, y)] = None
+                    except:
+                        pass
