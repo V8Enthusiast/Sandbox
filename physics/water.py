@@ -13,6 +13,8 @@ class WaterParticle:
         self.color = color
         self.rendered = False
         self.isFalling = True
+        self.temp = self.simulation.base_temp
+        self.melting_temp = 150
         self.strength = 0 # this is needed to calculate dissolving acid
 
     def render(self):
@@ -20,6 +22,18 @@ class WaterParticle:
             rect = pygame.Rect(0, 0, self.simulation.particle_size, self.simulation.particle_size)
             rect.center = (self.x * self.simulation.particle_size, self.y * self.simulation.particle_size)
             pygame.draw.rect(self.simulation.window, self.color, rect)
+            if self.simulation.heat_map[self.y][self.x] != self.temp:
+                diff = abs(self.simulation.heat_map[self.y][self.x] - self.temp)
+                if self.simulation.heat_map[self.y][self.x] > self.temp:
+                    self.temp += diff / 2
+                elif self.simulation.heat_map[self.y][self.x] < self.temp:
+                    self.temp -= diff / 2
+            if self.temp >= self.melting_temp:
+                self.simulation.smoke_particles[(self.x, self.y)] = smoke.SmokeParticle(self.simulation, self.x, self.y, 'H2O')
+                self.simulation.smoke_map[self.y][self.x] = 1
+                self.simulation.particles[(self.x, self.y)] = None
+                self.simulation.map[self.y][self.x] = 0
+
             self.calculate_physics()
             self.rendered = True
             self.simulation.active_water_particles += 1
